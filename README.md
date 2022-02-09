@@ -1,1 +1,2 @@
-# bigcommerce-api-go
+# Bigcommerce API Golang module for App development
+
