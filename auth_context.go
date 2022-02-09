@@ -11,7 +11,7 @@ import (
 
 // GetAuthContext returns an AuthContext object from the BigCommerce API
 // Call it with r.URL.Query() - will return BigCommerce Auth Context or error
-func (bc BigCommerce) GetAuthContext(requestURLQuery url.Values) (*AuthContext, error) {
+func (bc *BigCommerce) GetAuthContext(requestURLQuery url.Values) (*AuthContext, error) {
 
 	req := AuthTokenRequest{
 		ClientID:     bc.AppClientID,

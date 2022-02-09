@@ -13,7 +13,7 @@ import (
 
 // GetClientRequest returns a ClientRequest object from the BigCommerce API
 // Call it with r.URL.Query() - will return BigCommerce Client Request or error
-func (bc BigCommerce) GetClientReqest(requestURLQuery url.Values) (*ClientRequest, error) {
+func (bc *BigCommerce) GetClientReqest(requestURLQuery url.Values) (*ClientRequest, error) {
 	s := requestURLQuery.Get("signed_payload")
 	decoded, err := bc.CheckSignature(s)
 	if err != nil {
@@ -28,7 +28,7 @@ func (bc BigCommerce) GetClientReqest(requestURLQuery url.Values) (*ClientReques
 }
 
 // CheckSignature checks the signature of the request whith SHA256 HMAC
-func (bc BigCommerce) CheckSignature(signed_payload string) ([]byte, error) {
+func (bc *BigCommerce) CheckSignature(signed_payload string) ([]byte, error) {
 	ss := strings.Split(signed_payload, ".")
 	if signed_payload == "" {
 		return nil, fmt.Errorf("no signed payload")
