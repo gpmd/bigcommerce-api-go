@@ -1,22 +1,5 @@
 package bigcommerce
 
-// Product is a BigCommerce product object
-type Product struct {
-	ID        int64   `json:"-" db:"id"`
-	ClientID  int64   `json:"-" db:"client_id"`
-	ExtID     int64   `json:"id" db:"ext_id"`
-	Name      string  `json:"name" db:"name"`
-	SKU       string  `json:"sku" db:"sku"`
-	Visible   bool    `json:"is_visible" db:"visible"`
-	Thumbnail string  `json:"thumbnail" db:"thumbnail_url"`
-	URL       string  `json:"-" db:"url"`
-	Price     float64 `json:"price" db:"price"`
-	CustomURL struct {
-		URL          string `json:"url" db:"-"`
-		IsCustomised bool   `json:"is_customized" db:"-"`
-	} `json:"custom_url" db:"-"`
-}
-
 // WebhookPayload is a BigCommerce webhook payload object
 type WebhookPayload struct {
 	Scope     string                 `json:"scope"`
