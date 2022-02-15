@@ -24,10 +24,12 @@ type Image struct {
 	DateModified string `json:"date_modified"`
 }
 
-func (bc *BigCommerce) GetMainThumbnailURL(context, client, token string, productID int64) string {
-	url := context + "/v3/catalog/products/" + strconv.FormatInt(productID, 10) + "/images"
+// GetMainThumbnailURL returns the main thumbnail URL for a product
+// this is due to the fact that the Product API does not return the main thumbnail URL
+func (bc *BigCommerce) GetMainThumbnailURL(context, xAuthClient, xAuthToken string, bigcommerceProductID int64) string {
+	url := context + "/v3/catalog/products/" + strconv.FormatInt(bigcommerceProductID, 10) + "/images"
 
-	req := bc.getAPIRequest(http.MethodGet, url, client, token)
+	req := bc.getAPIRequest(http.MethodGet, url, xAuthClient, xAuthToken)
 	var c = &http.Client{
 		Timeout: time.Second * 10,
 	}

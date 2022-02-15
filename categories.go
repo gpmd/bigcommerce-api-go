@@ -24,7 +24,11 @@ type Category struct {
 	URL string `json:"-"`
 }
 
-func (bc *BigCommerce) GetAllCategories(context, client, token string) ([]Category, error) {
+// GetAllCategories returns a list of categories, handling pagination
+// context: the BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store hash
+// xAuthClient: the BigCommerce Store's X-Auth-Client coming from store credentials (see AuthContext)
+// xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials (see AuthContext)
+func (bc *BigCommerce) GetAllCategories(context, xAuthClient, xAuthToken string) ([]Category, error) {
 	cs := []Category{}
 	var csp []Category
 	page := 1
@@ -32,7 +36,7 @@ func (bc *BigCommerce) GetAllCategories(context, client, token string) ([]Catego
 	var err error
 	retries := 0
 	for more {
-		csp, more, err = bc.GetCategories(context, client, token, page)
+		csp, more, err = bc.GetCategories(context, xAuthClient, xAuthToken, page)
 		if err != nil {
 			log.Println(err)
 			retries++
@@ -56,10 +60,15 @@ func (bc *BigCommerce) GetAllCategories(context, client, token string) ([]Catego
 	return cs, err
 }
 
-func (bc *BigCommerce) GetCategories(context, client, token string, page int) ([]Category, bool, error) {
+// GetCategories returns a list of categories, handling pagination
+// context: the BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store hash
+// xAuthClient: the BigCommerce Store's X-Auth-Client coming from store credentials (see AuthContext)
+// xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials (see AuthContext)
+// page: the page number to download
+func (bc *BigCommerce) GetCategories(context, xAuthClient, xAuthToken string, page int) ([]Category, bool, error) {
 	url := context + "/v3/catalog/categories?include_fields=name,parent_id,is_visible,custom_url&page=" + strconv.Itoa(page)
 
-	req := bc.getAPIRequest(http.MethodGet, url, client, token)
+	req := bc.getAPIRequest(http.MethodGet, url, xAuthClient, xAuthToken)
 	var c = &http.Client{
 		Timeout: time.Second * 10,
 	}

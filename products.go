@@ -11,10 +11,10 @@ import (
 
 // Product is a BigCommerce product object
 type Product struct {
-	ExtID     int64   `json:"id"`
+	ID        int64   `json:"id"`
 	Name      string  `json:"name"`
 	SKU       string  `json:"sku"`
-	Visible   bool    `json:"is_visible`
+	Visible   bool    `json:"is_visible"`
 	Thumbnail string  `json:"thumbnail"`
 	URL       string  `json:"-"`
 	Price     float64 `json:"price"`

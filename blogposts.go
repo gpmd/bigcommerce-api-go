@@ -28,7 +28,11 @@ type Post struct {
 	ThumbnailPath        string      `json:"thumbnail_path"`
 }
 
-func (bc *BigCommerce) GetAllPosts(context, client, token string, cid int64) ([]Post, error) {
+// GetAllPosts downloads all posts from BigCommerce, handling pagination
+// context: the BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store hash
+// xAuthClient: the BigCommerce Store's X-Auth-Client coming from store credentials (see AuthContext)
+// xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials (see AuthContext)
+func (bc *BigCommerce) GetAllPosts(context, xAuthClient, xAuthToken string) ([]Post, error) {
 	cs := []Post{}
 	var csp []Post
 	page := 1
@@ -36,7 +40,7 @@ func (bc *BigCommerce) GetAllPosts(context, client, token string, cid int64) ([]
 	var err error
 	retries := 0
 	for more {
-		csp, more, err = bc.GetPosts(context, client, token, cid, page)
+		csp, more, err = bc.GetPosts(context, xAuthClient, xAuthToken, page)
 		if err != nil {
 			log.Println(err)
 			retries++
@@ -53,10 +57,15 @@ func (bc *BigCommerce) GetAllPosts(context, client, token string, cid int64) ([]
 	return cs, nil
 }
 
-func (bc *BigCommerce) GetPosts(context, client, token string, cid int64, page int) ([]Post, bool, error) {
+// GetPosts downloads all posts from BigCommerce, handling pagination
+// context: the BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store hash
+// xAuthClient: the BigCommerce Store's X-Auth-Client coming from store credentials (see AuthContext)
+// xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials (see AuthContext)
+// page: the page number to download
+func (bc *BigCommerce) GetPosts(context, xAuthClient, xAuthToken string, page int) ([]Post, bool, error) {
 	url := context + "/v2/blog/posts?limit=250&page=" + strconv.Itoa(page)
 
-	req := bc.getAPIRequest(http.MethodGet, url, client, token)
+	req := bc.getAPIRequest(http.MethodGet, url, xAuthClient, xAuthToken)
 	var c = &http.Client{
 		Timeout: time.Second * 10,
 	}

@@ -28,9 +28,9 @@ func (bc *BigCommerce) GetClientRequest(requestURLQuery url.Values) (*ClientRequ
 }
 
 // CheckSignature checks the signature of the request whith SHA256 HMAC
-func (bc *BigCommerce) CheckSignature(signed_payload string) ([]byte, error) {
-	ss := strings.Split(signed_payload, ".")
-	if signed_payload == "" {
+func (bc *BigCommerce) CheckSignature(signedPayload string) ([]byte, error) {
+	ss := strings.Split(signedPayload, ".")
+	if signedPayload == "" {
 		return nil, fmt.Errorf("no signed payload")
 	}
 	decoded, err := base64.StdEncoding.DecodeString(ss[0])

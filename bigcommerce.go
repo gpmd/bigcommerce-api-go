@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+// BigCommerce is the BigCommerce API client object for BigCommerce Apps
+// holds no client specific information
 type BigCommerce struct {
 	Hostname        string
 	AppClientID     string
@@ -14,10 +16,14 @@ type BigCommerce struct {
 	MaxRetries      int
 }
 
-type BigCommerceAPI interface {
-	GetAuthContext(clientId, clientSecret string, q url.Values) (*AuthContext, error)
+// AuthContexter interface for GetAuthContext
+type AuthContexter interface {
+	GetAuthContext(clientID, clientSecret string, q url.Values) (*AuthContext, error)
 }
 
+// New returns a new BigCommerce API object with the given hostname, client ID, and client secret
+// The client ID and secret are the App's client ID and secret from the BigCommerce My Apps dashboard
+// The hostname is the domain name of the app from the same page (e.g. app.exampledomain.com)
 func New(hostname, appClientID, appClientSecret string) *BigCommerce {
 	return &BigCommerce{
 		Hostname:        hostname,
@@ -30,11 +36,11 @@ func New(hostname, appClientID, appClientSecret string) *BigCommerce {
 	}
 }
 
-func (bc *BigCommerce) getAPIRequest(method, url, client, token string) *http.Request {
+func (bc *BigCommerce) getAPIRequest(method, url, xAuthClient, xAuthToken string) *http.Request {
 	req, _ := http.NewRequest(method, "https://api.bigcommerce.com/"+url, nil)
 
-	req.Header.Add("X-Auth-Client", client)
-	req.Header.Add("X-Auth-Token", token)
+	req.Header.Add("X-Auth-Client", xAuthClient)
+	req.Header.Add("X-Auth-Token", xAuthToken)
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("User-Agent", "GPMD Blog Post App")

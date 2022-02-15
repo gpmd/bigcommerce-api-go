@@ -1,5 +1,6 @@
 package bigcommerce
 
+// Customer is a struct for the BigCommerce Customer API
 type Customer struct {
 	ID               int64             `json:"id"`
 	Company          string            `json:"company"`
