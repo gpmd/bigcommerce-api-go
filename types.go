@@ -95,7 +95,6 @@ type StoreInfo struct {
 
 // AuthContext is a BigCommerce auth context object
 type AuthContext struct {
-	ClientID    string `json:"client_id"`    // used later as X-Auth-Client header
 	AccessToken string `json:"access_token"` // used later as X-Auth-Token header
 	Scope       string `json:"scope"`
 	User        BCUser `json:"user"`
