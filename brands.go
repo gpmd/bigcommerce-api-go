@@ -12,19 +12,18 @@ import (
 
 // Brand is BigCommerce brand object
 type Brand struct {
-	ExtID           int64    `json:"id" db:"ext_id"`
+	ID              int64    `json:"id"`
 	Name            string   `json:"name"`
 	PageTitle       string   `json:"page_title"`
 	MetaKeywords    []string `json:"meta_keywords"`
 	MetaDescription string   `json:"meta_description"`
-	ID              int      `json:"-" db:"id"`
 	ImageURL        string   `json:"image_url"`
 	SearchKeywords  string   `json:"search_keywords"`
 	CustomURL       struct {
 		URL          string `json:"url"`
 		IsCustomized bool   `json:"is_customized"`
 	} `json:"custom_url"`
-	URL string `json:"-" db:"url"`
+	URL string `json:"-"`
 }
 
 func (bc *BigCommerce) GetAllBrands(context, client, token string) ([]Brand, error) {

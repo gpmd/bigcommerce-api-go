@@ -12,18 +12,16 @@ import (
 
 // Category is a BC category object
 type Category struct {
-	ExtID     int64       `json:"id" db:"ext_id"`
-	Name      string      `json:"name"`
-	ParentID  int64       `json:"parent_id"`
-	Visible   bool        `json:"is_visible"`
-	ID        interface{} `json:"-" db:"id"`
-	ClientID  interface{} `json:"-" db:"client_id"`
-	FullName  string      `json:"-" db:"full_name"`
+	ID        int64  `json:"id"`
+	Name      string `json:"name"`
+	ParentID  int64  `json:"parent_id"`
+	Visible   bool   `json:"is_visible"`
+	FullName  string `json:"-"`
 	CustomURL struct {
-		URL        string `json:"url" db:"url"`
+		URL        string `json:"url"`
 		Customized bool   `json:"is_customized"`
 	} `json:"custom_url"`
-	URL string `json:"-" db:"url"`
+	URL string `json:"-"`
 }
 
 func (bc *BigCommerce) GetAllCategories(context, client, token string) ([]Category, error) {

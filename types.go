@@ -30,7 +30,6 @@ type BCUser struct {
 
 // LoadContext is a BigCommerce load context object
 type LoadContext struct {
-	SID       string  `json:"-" db:"id,omitempty"`
 	User      BCUser  `json:"user"`
 	Owner     BCUser  `json:"owner"`
 	Context   string  `json:"context"`

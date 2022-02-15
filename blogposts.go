@@ -12,24 +12,20 @@ import (
 
 // Post is a BC blog post
 type Post struct {
-	ExtID                int64       `json:"id" db:"ext_id"`
+	ID                   int64       `json:"id"`
 	Title                string      `json:"title"`
-	URL                  string      `json:"url" db:"url"`
+	URL                  string      `json:"url"`
 	PreviewURL           string      `json:"preview_url"`
 	Body                 string      `json:"body"`
 	Tags                 []string    `json:"tags"`
 	Summary              string      `json:"summary"`
-	IsPublished          bool        `json:"is_published" db:"published"`
-	PublishedDate        interface{} `json:"published_date" db:"published_date"`
+	IsPublished          bool        `json:"is_published"`
+	PublishedDate        interface{} `json:"published_date"`
 	PublishedDateISO8601 string      `json:"published_date_iso8601"`
 	MetaDescription      string      `json:"meta_description"`
 	MetaKeywords         string      `json:"meta_keywords"`
-	Author               string      `json:"author" db:"author"`
-	ThumbnailPath        string      `json:"thumbnail_path" db:"thumbnail_path"`
-	Featured             bool        `json:"-" db:"featured"`
-	Assigned             []Product   `json:"assigned"`
-	AssignedCats         []Category  `json:"categories"`
-	AssignedBrands       []Brand     `json:"brands"`
+	Author               string      `json:"author"`
+	ThumbnailPath        string      `json:"thumbnail_path"`
 }
 
 func (bc *BigCommerce) GetAllPosts(context, client, token string, cid int64) ([]Post, error) {
