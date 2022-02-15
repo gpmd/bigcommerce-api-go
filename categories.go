@@ -46,7 +46,7 @@ func (bc *BigCommerce) GetAllCategories(context, client, token string) ([]Catego
 	}
 	extidmap := map[int64]int{}
 	for i, c := range cs {
-		extidmap[c.ExtID] = i
+		extidmap[c.ID] = i
 	}
 	for i := range cs {
 		cs[i].URL = cs[i].CustomURL.URL

@@ -49,7 +49,7 @@ func (bc *BigCommerce) GetAllBrands(context, client, token string) ([]Brand, err
 		page++
 	}
 	for i, c := range cs {
-		extidmap[c.ExtID] = i
+		extidmap[c.ID] = i
 	}
 	for i := range cs {
 		cs[i].URL = cs[i].CustomURL.URL
