@@ -1,7 +1,6 @@
 package bigcommerce
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -13,15 +12,14 @@ import (
 
 // Brand is BigCommerce brand object
 type Brand struct {
-	ExtID           int64         `json:"id" db:"ext_id"`
-	Name            string        `json:"name"`
-	PageTitle       string        `json:"page_title"`
-	MetaKeywords    []string      `json:"meta_keywords"`
-	MetaDescription string        `json:"meta_description"`
-	ID              int           `json:"-" db:"id"`
-	ImageURL        string        `json:"image_url"`
-	ClientID        sql.NullInt64 `json:"-" db:"client_id"`
-	SearchKeywords  string        `json:"search_keywords"`
+	ExtID           int64    `json:"id" db:"ext_id"`
+	Name            string   `json:"name"`
+	PageTitle       string   `json:"page_title"`
+	MetaKeywords    []string `json:"meta_keywords"`
+	MetaDescription string   `json:"meta_description"`
+	ID              int      `json:"-" db:"id"`
+	ImageURL        string   `json:"image_url"`
+	SearchKeywords  string   `json:"search_keywords"`
 	CustomURL       struct {
 		URL          string `json:"url"`
 		IsCustomized bool   `json:"is_customized"`
