@@ -25,7 +25,7 @@ type Product struct {
 }
 
 // GetAllProducts gets all products from BigCommerce
-func (bc *BigCommerce) GetAllProducts(context, client, token string) []Product {
+func (bc *BigCommerce) GetAllProducts(context, client, token string) ([]Product, error) {
 	ps := []Product{}
 	var psp []Product
 	page := 1
@@ -39,7 +39,7 @@ func (bc *BigCommerce) GetAllProducts(context, client, token string) []Product {
 			retries++
 			if retries > bc.MaxRetries {
 				log.Println("Max retries reached")
-				return ps
+				return ps, err
 			}
 			break
 		}
@@ -47,7 +47,7 @@ func (bc *BigCommerce) GetAllProducts(context, client, token string) []Product {
 		ps = append(ps, psp...)
 		page++
 	}
-	return ps
+	return ps, nil
 }
 
 // GetProducts gets a page of products from BigCommerce
