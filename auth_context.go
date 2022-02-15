@@ -39,6 +39,7 @@ func (bc *BigCommerce) GetAuthContext(requestURLQuery url.Values) (*AuthContext,
 	if err != nil {
 		return nil, err
 	}
+	res.Body.Close()
 
 	if strings.Contains(string(bytes), "invalid_") {
 		return nil, fmt.Errorf("%s", string(bytes))
@@ -48,6 +49,9 @@ func (bc *BigCommerce) GetAuthContext(requestURLQuery url.Values) (*AuthContext,
 	err = json.Unmarshal(bytes, &ac)
 	if err != nil {
 		return nil, err
+	}
+	if ac.Error != "" {
+		return nil, fmt.Errorf("AuthContext error: %s", ac.Error)
 	}
 	return &ac, nil
 }

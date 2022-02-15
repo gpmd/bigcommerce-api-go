@@ -14,10 +14,10 @@ type WebhookPayload struct {
 type AuthTokenRequest struct {
 	ClientID     string `json:"client_id"`
 	ClientSecret string `json:"client_secret"`
-	RedirectURI  string `json:"redirect_uri"`
-	GrantType    string `json:"grant_type"`
 	Code         string `json:"code"`
 	Scope        string `json:"scope"`
+	GrantType    string `json:"grant_type"`
+	RedirectURI  string `json:"redirect_uri"`
 	Context      string `json:"context"`
 }
 
@@ -101,6 +101,7 @@ type AuthContext struct {
 	User        BCUser `json:"user"`
 	Context     string `json:"context"`
 	URL         string `json:"url"`
+	Error       string `json:"error"`
 }
 
 // UserPart is a BigCommerce user shorthand object type that's in many other responses
