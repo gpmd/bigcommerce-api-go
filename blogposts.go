@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 // Post is a BC blog post
@@ -20,19 +19,18 @@ type Post struct {
 	Tags                 []string    `json:"tags"`
 	Summary              string      `json:"summary"`
 	IsPublished          bool        `json:"is_published"`
-	PublishedDate        interface{} `json:"published_date"`
-	PublishedDateISO8601 string      `json:"published_date_iso8601"`
+	PublishedDate        interface{} `json:"publisheddate"`
+	PublishedDateISO8601 string      `json:"publisheddate_iso8601"`
 	MetaDescription      string      `json:"meta_description"`
 	MetaKeywords         string      `json:"meta_keywords"`
 	Author               string      `json:"author"`
-	ThumbnailPath        string      `json:"thumbnail_path"`
+	ThumbnailPath        string      `json:"thumbnailpath"`
 }
 
 // GetAllPosts downloads all posts from BigCommerce, handling pagination
 // context: the BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store hash
-// xAuthClient: the BigCommerce Store's X-Auth-Client coming from store credentials (see AuthContext)
 // xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials (see AuthContext)
-func (bc *BigCommerce) GetAllPosts(context, xAuthClient, xAuthToken string) ([]Post, error) {
+func (bc *BigCommerce) GetAllPosts(context, xAuthToken string) ([]Post, error) {
 	cs := []Post{}
 	var csp []Post
 	page := 1
@@ -40,7 +38,7 @@ func (bc *BigCommerce) GetAllPosts(context, xAuthClient, xAuthToken string) ([]P
 	var err error
 	retries := 0
 	for more {
-		csp, more, err = bc.GetPosts(context, xAuthClient, xAuthToken, page)
+		csp, more, err = bc.GetPosts(context, xAuthToken, page)
 		if err != nil {
 			log.Println(err)
 			retries++
@@ -50,7 +48,6 @@ func (bc *BigCommerce) GetAllPosts(context, xAuthClient, xAuthToken string) ([]P
 			}
 			break
 		}
-		log.Println("More posts:", more, " count:", len(csp))
 		cs = append(cs, csp...)
 		page++
 	}
@@ -59,25 +56,20 @@ func (bc *BigCommerce) GetAllPosts(context, xAuthClient, xAuthToken string) ([]P
 
 // GetPosts downloads all posts from BigCommerce, handling pagination
 // context: the BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store hash
-// xAuthClient: the BigCommerce Store's X-Auth-Client coming from store credentials (see AuthContext)
 // xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials (see AuthContext)
 // page: the page number to download
-func (bc *BigCommerce) GetPosts(context, xAuthClient, xAuthToken string, page int) ([]Post, bool, error) {
+func (bc *BigCommerce) GetPosts(context, xAuthToken string, page int) ([]Post, bool, error) {
 	url := context + "/v2/blog/posts?limit=250&page=" + strconv.Itoa(page)
 
-	req := bc.getAPIRequest(http.MethodGet, url, xAuthClient, xAuthToken)
-	var c = &http.Client{
-		Timeout: time.Second * 10,
-	}
-	res, err := c.Do(req)
+	req := bc.getAPIRequest(http.MethodGet, url, xAuthToken, nil)
+	res, err := bc.DefaultClient.Do(req)
 	if err != nil {
 		return nil, false, err
 	}
 
 	defer res.Body.Close()
-
 	if res.StatusCode == http.StatusNoContent {
-		return []Post{}, false, fmt.Errorf("no content from BigCommerce (status: %d)", res.StatusCode)
+		return nil, false, ErrNoContent
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
@@ -88,7 +80,8 @@ func (bc *BigCommerce) GetPosts(context, xAuthClient, xAuthToken string, page in
 	var pp []Post
 	err = json.Unmarshal(body, &pp)
 	if err != nil {
+		log.Printf("Error unmarshalling posts: %s %s", err, string(body))
 		return nil, false, err
 	}
-	return pp, len(pp) > 0, nil
+	return pp, len(pp) == 250, nil
 }

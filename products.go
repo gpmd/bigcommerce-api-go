@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 // Product is a BigCommerce product object
@@ -25,7 +24,9 @@ type Product struct {
 }
 
 // GetAllProducts gets all products from BigCommerce
-func (bc *BigCommerce) GetAllProducts(context, client, token string) ([]Product, error) {
+// context: the BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store hash
+// xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials (see AuthContext)
+func (bc *BigCommerce) GetAllProducts(context, xAuthToken string) ([]Product, error) {
 	ps := []Product{}
 	var psp []Product
 	page := 1
@@ -33,7 +34,7 @@ func (bc *BigCommerce) GetAllProducts(context, client, token string) ([]Product,
 	var err error
 	retries := 0
 	for more {
-		psp, more, err = bc.GetProducts(context, client, token, page)
+		psp, more, err = bc.GetProducts(context, xAuthToken, page)
 		if err != nil {
 			log.Println(err)
 			retries++
@@ -43,7 +44,6 @@ func (bc *BigCommerce) GetAllProducts(context, client, token string) ([]Product,
 			}
 			break
 		}
-		log.Println("More prods:", more, " count:", len(psp))
 		ps = append(ps, psp...)
 		page++
 	}
@@ -51,18 +51,22 @@ func (bc *BigCommerce) GetAllProducts(context, client, token string) ([]Product,
 }
 
 // GetProducts gets a page of products from BigCommerce
-func (bc *BigCommerce) GetProducts(context, client, token string, page int) ([]Product, bool, error) {
+// context: the BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store hash
+// xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials (see AuthContext)
+// page: the page number to download
+func (bc *BigCommerce) GetProducts(context, xAuthToken string, page int) ([]Product, bool, error) {
 	url := context + "/v3/catalog/products?include_fields=name,sku,custom_url,is_visible,price&page=" + strconv.Itoa(page)
 
-	req := bc.getAPIRequest(http.MethodGet, url, client, token)
-	var c = &http.Client{
-		Timeout: time.Second * 10,
-	}
-	res, err := c.Do(req)
+	req := bc.getAPIRequest(http.MethodGet, url, xAuthToken, nil)
+	res, err := bc.DefaultClient.Do(req)
 	if err != nil {
 		return nil, false, err
 	}
 	defer res.Body.Close()
+	if res.StatusCode == http.StatusNoContent {
+		return nil, false, ErrNoContent
+	}
+
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, false, err

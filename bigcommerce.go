@@ -1,6 +1,8 @@
 package bigcommerce
 
 import (
+	"errors"
+	"io"
 	"net/http"
 	"net/url"
 	"time"
@@ -15,6 +17,8 @@ type BigCommerce struct {
 	DefaultClient   *http.Client
 	MaxRetries      int
 }
+
+var ErrNoContent = errors.New("no content 204 from BigCommerce API")
 
 // AuthContexter interface for GetAuthContext
 type AuthContexter interface {
@@ -36,10 +40,10 @@ func New(hostname, appClientID, appClientSecret string) *BigCommerce {
 	}
 }
 
-func (bc *BigCommerce) getAPIRequest(method, url, xAuthClient, xAuthToken string) *http.Request {
-	req, _ := http.NewRequest(method, "https://api.bigcommerce.com/"+url, nil)
+func (bc *BigCommerce) getAPIRequest(method, url, xAuthToken string, body io.Reader) *http.Request {
+	req, _ := http.NewRequest(method, "https://api.bigcommerce.com/"+url, body)
 
-	req.Header.Add("X-Auth-Client", xAuthClient)
+	req.Header.Add("X-Auth-Client", bc.AppClientID)
 	req.Header.Add("X-Auth-Token", xAuthToken)
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")

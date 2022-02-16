@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 // Brand is BigCommerce brand object
@@ -28,9 +27,8 @@ type Brand struct {
 
 // GetAllBrands returns all brands, handling pagination
 // context: the BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store hash
-// xAuthClient: the BigCommerce Store's X-Auth-Client coming from store credentials (see AuthContext)
 // xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials (see AuthContext)
-func (bc *BigCommerce) GetAllBrands(context, xAuthClient, xAuthToken string) ([]Brand, error) {
+func (bc *BigCommerce) GetAllBrands(context, xAuthToken string) ([]Brand, error) {
 	cs := []Brand{}
 	var csp []Brand
 	page := 1
@@ -39,7 +37,7 @@ func (bc *BigCommerce) GetAllBrands(context, xAuthClient, xAuthToken string) ([]
 	var err error
 	var retries int
 	for more {
-		csp, more, err = bc.GetBrands(context, xAuthClient, xAuthToken, page)
+		csp, more, err = bc.GetBrands(context, xAuthToken, page)
 		if err != nil {
 			log.Println(err)
 			retries++
@@ -48,7 +46,6 @@ func (bc *BigCommerce) GetAllBrands(context, xAuthClient, xAuthToken string) ([]
 			}
 			break
 		}
-		log.Println("More brands:", more, " count:", len(csp))
 		cs = append(cs, csp...)
 		page++
 	}
@@ -63,22 +60,22 @@ func (bc *BigCommerce) GetAllBrands(context, xAuthClient, xAuthToken string) ([]
 
 // GetBrands returns all brands, handling pagination
 // context: the BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store hash
-// xAuthClient: the BigCommerce Store's X-Auth-Client coming from store credentials (see AuthContext)
 // xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials (see AuthContext)
 // page: the page number to download
-func (bc *BigCommerce) GetBrands(context, xAuthClient, xAuthToken string, page int) ([]Brand, bool, error) {
+func (bc *BigCommerce) GetBrands(context, xAuthToken string, page int) ([]Brand, bool, error) {
 	url := context + "/v3/catalog/brands?page=" + strconv.Itoa(page)
 
-	req := bc.getAPIRequest(http.MethodGet, url, xAuthClient, xAuthToken)
-	var c = &http.Client{
-		Timeout: time.Second * 10,
-	}
-	res, err := c.Do(req)
+	req := bc.getAPIRequest(http.MethodGet, url, xAuthToken, nil)
+	res, err := bc.DefaultClient.Do(req)
 	if err != nil {
 		return nil, false, err
 	}
 
 	defer res.Body.Close()
+	if res.StatusCode == http.StatusNoContent {
+		return nil, false, ErrNoContent
+	}
+
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, false, err

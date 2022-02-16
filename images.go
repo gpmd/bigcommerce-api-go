@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 // Image is entry for BC product images
@@ -26,14 +25,11 @@ type Image struct {
 
 // GetMainThumbnailURL returns the main thumbnail URL for a product
 // this is due to the fact that the Product API does not return the main thumbnail URL
-func (bc *BigCommerce) GetMainThumbnailURL(context, xAuthClient, xAuthToken string, bigcommerceProductID int64) string {
+func (bc *BigCommerce) GetMainThumbnailURL(context, xAuthToken string, bigcommerceProductID int64) string {
 	url := context + "/v3/catalog/products/" + strconv.FormatInt(bigcommerceProductID, 10) + "/images"
 
-	req := bc.getAPIRequest(http.MethodGet, url, xAuthClient, xAuthToken)
-	var c = &http.Client{
-		Timeout: time.Second * 10,
-	}
-	res, err := c.Do(req)
+	req := bc.getAPIRequest(http.MethodGet, url, xAuthToken, nil)
+	res, err := bc.DefaultClient.Do(req)
 	if err != nil {
 		return ""
 	}
