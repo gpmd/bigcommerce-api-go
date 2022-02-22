@@ -6,7 +6,10 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 )
+
+var productFields = []string{"name", "sku", "custom_url", "is_visible", "price"}
 
 // Product is a BigCommerce product object
 type Product struct {
@@ -21,6 +24,11 @@ type Product struct {
 		URL          string `json:"url"`
 		IsCustomised bool   `json:"is_customized"`
 	} `json:"custom_url"`
+}
+
+// SetProductFields sets include_fields parameter for GetProducts, empty list will get all fields
+func (bc *BigCommerce) SetProductFields(f []string) {
+	productFields = f
 }
 
 // GetAllProducts gets all products from BigCommerce
@@ -55,7 +63,11 @@ func (bc *BigCommerce) GetAllProducts(context, xAuthToken string) ([]Product, er
 // xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials (see AuthContext)
 // page: the page number to download
 func (bc *BigCommerce) GetProducts(context, xAuthToken string, page int) ([]Product, bool, error) {
-	url := context + "/v3/catalog/products?include_fields=name,sku,custom_url,is_visible,price&page=" + strconv.Itoa(page)
+	fpart := ""
+	if len(productFields) != 0 {
+		fpart = "&include_fields=" + strings.Join(productFields, ",")
+	}
+	url := context + "/v3/catalog/products?page=" + strconv.Itoa(page) + fpart
 
 	req := bc.getAPIRequest(http.MethodGet, url, xAuthToken, nil)
 	res, err := bc.DefaultClient.Do(req)
