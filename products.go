@@ -7,28 +7,137 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
+// include_fields
 var productFields = []string{"name", "sku", "custom_url", "is_visible", "price"}
+
+// include (subresources, like variants images custom_fields bulk_pricing_rules primary_image modifiers options videos)
+var productInclude []string
 
 // Product is a BigCommerce product object
 type Product struct {
-	ID        int64   `json:"id"`
-	Name      string  `json:"name"`
-	SKU       string  `json:"sku"`
-	Visible   bool    `json:"is_visible"`
-	Thumbnail string  `json:"thumbnail"`
-	URL       string  `json:"-"`
-	Price     float64 `json:"price"`
-	CustomURL struct {
-		URL          string `json:"url"`
-		IsCustomised bool   `json:"is_customized"`
-	} `json:"custom_url"`
+	ID                      int64         `json:"id,omitempty"`
+	Name                    string        `json:"name,omitempty"`
+	Type                    string        `json:"type,omitempty"`
+	Sku                     string        `json:"sku,omitempty"`
+	Description             string        `json:"description,omitempty"`
+	Weight                  float64       `json:"weight,omitempty"`
+	Width                   int           `json:"width,omitempty"`
+	Depth                   int           `json:"depth,omitempty"`
+	Height                  int           `json:"height,omitempty"`
+	Price                   float64       `json:"price,omitempty"`
+	CostPrice               float64       `json:"cost_price,omitempty"`
+	RetailPrice             float64       `json:"retail_price,omitempty"`
+	SalePrice               float64       `json:"sale_price,omitempty"`
+	MapPrice                float64       `json:"map_price,omitempty"`
+	TaxClassID              int64         `json:"tax_class_id,omitempty"`
+	ProductTaxCode          string        `json:"product_tax_code,omitempty"`
+	CalculatedPrice         float64       `json:"calculated_price,omitempty"`
+	Categories              []interface{} `json:"categories,omitempty"`
+	BrandID                 int64         `json:"brand_id,omitempty"`
+	OptionSetID             interface{}   `json:"option_set_id,omitempty"`
+	OptionSetDisplay        string        `json:"option_set_display,omitempty"`
+	InventoryLevel          int           `json:"inventory_level,omitempty"`
+	InventoryWarningLevel   int           `json:"inventory_warning_level,omitempty"`
+	InventoryTracking       string        `json:"inventory_tracking,omitempty"`
+	ReviewsRatingSum        int           `json:"reviews_rating_sum,omitempty"`
+	ReviewsCount            int           `json:"reviews_count,omitempty"`
+	TotalSold               int           `json:"total_sold,omitempty"`
+	FixedCostShippingPrice  float64       `json:"fixed_cost_shipping_price,omitempty"`
+	IsFreeShipping          bool          `json:"is_free_shipping,omitempty"`
+	IsVisible               bool          `json:"is_visible,omitempty"`
+	IsFeatured              bool          `json:"is_featured,omitempty"`
+	RelatedProducts         []int         `json:"related_products,omitempty"`
+	Warranty                string        `json:"warranty,omitempty"`
+	BinPickingNumber        string        `json:"bin_picking_number,omitempty"`
+	LayoutFile              string        `json:"layout_file,omitempty"`
+	Upc                     string        `json:"upc,omitempty"`
+	Mpn                     string        `json:"mpn,omitempty"`
+	Gtin                    string        `json:"gtin,omitempty"`
+	SearchKeywords          string        `json:"search_keywords,omitempty"`
+	Availability            string        `json:"availability,omitempty"`
+	AvailabilityDescription string        `json:"availability_description,omitempty"`
+	GiftWrappingOptionsType string        `json:"gift_wrapping_options_type,omitempty"`
+	GiftWrappingOptionsList []interface{} `json:"gift_wrapping_options_list,omitempty"`
+	SortOrder               int           `json:"sort_order,omitempty"`
+	Condition               string        `json:"condition,omitempty"`
+	IsConditionShown        bool          `json:"is_condition_shown,omitempty"`
+	OrderQuantityMinimum    int           `json:"order_quantity_minimum,omitempty"`
+	OrderQuantityMaximum    int           `json:"order_quantity_maximum,omitempty"`
+	PageTitle               string        `json:"page_title,omitempty"`
+	MetaKeywords            []interface{} `json:"meta_keywords,omitempty"`
+	MetaDescription         string        `json:"meta_description,omitempty"`
+	DateCreated             time.Time     `json:"date_created,omitempty"`
+	DateModified            time.Time     `json:"date_modified,omitempty"`
+	ViewCount               int           `json:"view_count,omitempty"`
+	PreorderReleaseDate     interface{}   `json:"preorder_release_date,omitempty"`
+	PreorderMessage         string        `json:"preorder_message,omitempty"`
+	IsPreorderOnly          bool          `json:"is_preorder_only,omitempty"`
+	IsPriceHidden           bool          `json:"is_price_hidden,omitempty"`
+	PriceHiddenLabel        string        `json:"price_hidden_label,omitempty"`
+	CustomURL               struct {
+		URL          string `json:"url,omitempty"`
+		IsCustomized bool   `json:"is_customized,omitempty"`
+	} `json:"custom_url,omitempty"`
+	BaseVariantID               int64  `json:"base_variant_id,omitempty"`
+	OpenGraphType               string `json:"open_graph_type,omitempty"`
+	OpenGraphTitle              string `json:"open_graph_title,omitempty"`
+	OpenGraphDescription        string `json:"open_graph_description,omitempty"`
+	OpenGraphUseMetaDescription bool   `json:"open_graph_use_meta_description,omitempty"`
+	OpenGraphUseProductName     bool   `json:"open_graph_use_product_name,omitempty"`
+	OpenGraphUseImage           bool   `json:"open_graph_use_image,omitempty"`
+	Variants                    []struct {
+		ID                        int64         `json:"id,omitempty"`
+		ProductID                 int64         `json:"product_id,omitempty"`
+		Sku                       string        `json:"sku,omitempty"`
+		SkuID                     interface{}   `json:"sku_id,omitempty"`
+		Price                     float64       `json:"price,omitempty"`
+		CalculatedPrice           float64       `json:"calculated_price,omitempty"`
+		SalePrice                 float64       `json:"sale_price,omitempty"`
+		RetailPrice               float64       `json:"retail_price,omitempty"`
+		MapPrice                  float64       `json:"map_price,omitempty"`
+		Weight                    float64       `json:"weight,omitempty"`
+		Width                     int           `json:"width,omitempty"`
+		Height                    int           `json:"height,omitempty"`
+		Depth                     int           `json:"depth,omitempty"`
+		IsFreeShipping            bool          `json:"is_free_shipping,omitempty"`
+		FixedCostShippingPrice    float64       `json:"fixed_cost_shipping_price,omitempty"`
+		CalculatedWeight          float64       `json:"calculated_weight,omitempty"`
+		PurchasingDisabled        bool          `json:"purchasing_disabled,omitempty"`
+		PurchasingDisabledMessage string        `json:"purchasing_disabled_message,omitempty"`
+		ImageURL                  string        `json:"image_url,omitempty"`
+		CostPrice                 float64       `json:"cost_price,omitempty"`
+		Upc                       string        `json:"upc,omitempty"`
+		Mpn                       string        `json:"mpn,omitempty"`
+		Gtin                      string        `json:"gtin,omitempty"`
+		InventoryLevel            int           `json:"inventory_level,omitempty"`
+		InventoryWarningLevel     int           `json:"inventory_warning_level,omitempty"`
+		BinPickingNumber          string        `json:"bin_picking_number,omitempty"`
+		OptionValues              []interface{} `json:"option_values,omitempty"`
+	} `json:"variants,omitempty"`
+	Images       []interface{} `json:"images,omitempty"`
+	PrimaryImage interface{}   `json:"primary_image,omitempty"`
+	Videos       []interface{} `json:"videos,omitempty"`
+	CustomFields []struct {
+		ID    int64  `json:"id,omitempty"`
+		Name  string `json:"name,omitempty"`
+		Value string `json:"value,omitempty"`
+	} `json:"custom_fields,omitempty"`
+	BulkPricingRules []interface{} `json:"bulk_pricing_rules,omitempty"`
+	Options          []interface{} `json:"options,omitempty"`
+	Modifiers        []interface{} `json:"modifiers,omitempty"`
 }
 
 // SetProductFields sets include_fields parameter for GetProducts, empty list will get all fields
-func (bc *BigCommerce) SetProductFields(f []string) {
-	productFields = f
+func (bc *BigCommerce) SetProductFields(fields []string) {
+	productFields = fields
+}
+
+// SetProductFields sets include_fields parameter for GetProducts, empty list will get all fields
+func (bc *BigCommerce) SetProductInclude(subresources []string) {
+	productInclude = subresources
 }
 
 // GetAllProducts gets all products from BigCommerce
@@ -67,6 +176,9 @@ func (bc *BigCommerce) GetProducts(context, xAuthToken string, page int) ([]Prod
 	if len(productFields) != 0 {
 		fpart = "&include_fields=" + strings.Join(productFields, ",")
 	}
+	if len(productInclude) != 0 {
+		fpart = "&include=" + strings.Join(productInclude, ",")
+	}
 	url := context + "/v3/catalog/products?page=" + strconv.Itoa(page) + fpart
 
 	req := bc.getAPIRequest(http.MethodGet, url, xAuthToken, nil)
@@ -84,18 +196,18 @@ func (bc *BigCommerce) GetProducts(context, xAuthToken string, page int) ([]Prod
 		return nil, false, err
 	}
 	var pp struct {
-		Data []Product `json:"data"`
+		Data []Product `json:"data,omitempty,omitempty"`
 		Meta struct {
 			Pagination struct {
-				Total       int64       `json:"total"`
-				Count       int64       `json:"count"`
-				PerPage     int64       `json:"per_page"`
-				CurrentPage int64       `json:"current_page"`
-				TotalPages  int64       `json:"total_pages"`
-				Links       interface{} `json:"links"`
-				TooMany     bool        `json:"too_many"`
-			} `json:"pagination"`
-		} `json:"meta"`
+				Total       int64       `json:"total,omitempty,omitempty"`
+				Count       int64       `json:"count,omitempty,omitempty"`
+				PerPage     int64       `json:"per_page,omitempty,omitempty"`
+				CurrentPage int64       `json:"current_page,omitempty,omitempty"`
+				TotalPages  int64       `json:"total_pages,omitempty,omitempty"`
+				Links       interface{} `json:"links,omitempty,omitempty"`
+				TooMany     bool        `json:"too_many,omitempty,omitempty"`
+			} `json:"pagination,omitempty,omitempty"`
+		} `json:"meta,omitempty,omitempty"`
 	}
 	err = json.Unmarshal(body, &pp)
 	if err != nil {
