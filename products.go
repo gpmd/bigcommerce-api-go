@@ -196,22 +196,50 @@ func (bc *BigCommerce) GetProducts(context, xAuthToken string, page int) ([]Prod
 		return nil, false, err
 	}
 	var pp struct {
-		Data []Product `json:"data,omitempty,omitempty"`
+		Data []Product `json:"data,omitempty"`
 		Meta struct {
 			Pagination struct {
-				Total       int64       `json:"total,omitempty,omitempty"`
-				Count       int64       `json:"count,omitempty,omitempty"`
-				PerPage     int64       `json:"per_page,omitempty,omitempty"`
-				CurrentPage int64       `json:"current_page,omitempty,omitempty"`
-				TotalPages  int64       `json:"total_pages,omitempty,omitempty"`
-				Links       interface{} `json:"links,omitempty,omitempty"`
-				TooMany     bool        `json:"too_many,omitempty,omitempty"`
-			} `json:"pagination,omitempty,omitempty"`
-		} `json:"meta,omitempty,omitempty"`
+				Total       int64       `json:"total,omitempty"`
+				Count       int64       `json:"count,omitempty"`
+				PerPage     int64       `json:"per_page,omitempty"`
+				CurrentPage int64       `json:"current_page,omitempty"`
+				TotalPages  int64       `json:"total_pages,omitempty"`
+				Links       interface{} `json:"links,omitempty"`
+				TooMany     bool        `json:"too_many,omitempty"`
+			} `json:"pagination,omitempty"`
+		} `json:"meta,omitempty"`
 	}
 	err = json.Unmarshal(body, &pp)
 	if err != nil {
 		return nil, false, err
 	}
 	return pp.Data, pp.Meta.Pagination.CurrentPage < pp.Meta.Pagination.TotalPages, nil
+}
+
+// GetProductByID gets a product from BigCommerce by ID
+// context: the BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store hash
+// productID: BigCommerce product ID to get
+// xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials (see AuthContext)
+func (bc *BigCommerce) GetProductByID(context string, productID int64, xAuthToken string) (*Product, error) {
+	url := context + "/v3/catalog/products/" + strconv.FormatInt(productID, 10)
+	req := bc.getAPIRequest(http.MethodGet, url, xAuthToken, nil)
+	res, err := bc.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+	if res.StatusCode == http.StatusNoContent {
+		return nil, ErrNoContent
+	}
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	var product Product
+	err = json.Unmarshal(body, &product)
+	if err != nil {
+		return nil, err
+	}
+	return &product, nil
 }

@@ -1,15 +1,5 @@
 package bigcommerce
 
-// WebhookPayload is a BigCommerce webhook payload object
-type WebhookPayload struct {
-	Scope     string                 `json:"scope"`
-	StoreID   string                 `json:"store_id"`
-	Data      map[string]interface{} `json:"data"`
-	Hash      string                 `json:"hash"`
-	CreatedAt string                 `json:"created_at"`
-	Producer  string                 `json:"producer"`
-}
-
 // AuthTokenRequest is sent to BigCommerce to get AuthContext
 type AuthTokenRequest struct {
 	ClientID     string `json:"client_id"`
