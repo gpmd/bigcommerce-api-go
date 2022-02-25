@@ -3,8 +3,6 @@ package bigcommerce
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -26,9 +24,7 @@ type Brand struct {
 }
 
 // GetAllBrands returns all brands, handling pagination
-// context: the BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store hash
-// xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials (see AuthContext)
-func (bc *BigCommerce) GetAllBrands(context, xAuthToken string) ([]Brand, error) {
+func (bc *BigCommerce) GetAllBrands() ([]Brand, error) {
 	cs := []Brand{}
 	var csp []Brand
 	page := 1
@@ -37,9 +33,8 @@ func (bc *BigCommerce) GetAllBrands(context, xAuthToken string) ([]Brand, error)
 	var err error
 	var retries int
 	for more {
-		csp, more, err = bc.GetBrands(context, xAuthToken, page)
+		csp, more, err = bc.GetBrands(page)
 		if err != nil {
-			log.Println(err)
 			retries++
 			if retries > bc.MaxRetries {
 				return cs, fmt.Errorf("max retries reached")
@@ -62,21 +57,17 @@ func (bc *BigCommerce) GetAllBrands(context, xAuthToken string) ([]Brand, error)
 // context: the BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store hash
 // xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials (see AuthContext)
 // page: the page number to download
-func (bc *BigCommerce) GetBrands(context, xAuthToken string, page int) ([]Brand, bool, error) {
-	url := context + "/v3/catalog/brands?page=" + strconv.Itoa(page)
+func (bc *BigCommerce) GetBrands(page int) ([]Brand, bool, error) {
+	url := "/v3/catalog/brands?page=" + strconv.Itoa(page)
 
-	req := bc.getAPIRequest(http.MethodGet, url, xAuthToken, nil)
-	res, err := bc.DefaultClient.Do(req)
+	req := bc.getAPIRequest(http.MethodGet, url, nil)
+	res, err := bc.HTTPClient.Do(req)
 	if err != nil {
 		return nil, false, err
 	}
 
 	defer res.Body.Close()
-	if res.StatusCode == http.StatusNoContent {
-		return nil, false, ErrNoContent
-	}
-
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := processBody(res)
 	if err != nil {
 		return nil, false, err
 	}

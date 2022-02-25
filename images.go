@@ -2,7 +2,6 @@ package bigcommerce
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
@@ -25,20 +24,19 @@ type Image struct {
 
 // GetMainThumbnailURL returns the main thumbnail URL for a product
 // this is due to the fact that the Product API does not return the main thumbnail URL
-func (bc *BigCommerce) GetMainThumbnailURL(context, xAuthToken string, bigcommerceProductID int64) string {
-	url := context + "/v3/catalog/products/" + strconv.FormatInt(bigcommerceProductID, 10) + "/images"
+func (bc *BigCommerce) GetMainThumbnailURL(productID int64) (string, error) {
+	url := "/v3/catalog/products/" + strconv.FormatInt(productID, 10) + "/images"
 
-	req := bc.getAPIRequest(http.MethodGet, url, xAuthToken, nil)
-	res, err := bc.DefaultClient.Do(req)
+	req := bc.getAPIRequest(http.MethodGet, url, nil)
+	res, err := bc.HTTPClient.Do(req)
 	if err != nil {
-		return ""
+		return "", err
 	}
 
 	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := processBody(res)
 	if err != nil {
-		log.Println(err)
-		return ""
+		return "", err
 	}
 
 	var pp struct {
@@ -58,12 +56,12 @@ func (bc *BigCommerce) GetMainThumbnailURL(context, xAuthToken string, bigcommer
 	err = json.Unmarshal(body, &pp)
 	if err != nil {
 		log.Println(err)
-		return ""
+		return "", err
 	}
 	for _, p := range pp.Data {
 		if p.IsThumbnail {
-			return p.URLThumbnail
+			return p.URLThumbnail, nil
 		}
 	}
-	return ""
+	return "", ErrNoMainThumbnail
 }

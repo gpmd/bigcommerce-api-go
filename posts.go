@@ -3,7 +3,6 @@ package bigcommerce
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
@@ -38,9 +37,8 @@ func (bc *BigCommerce) GetAllPosts(context, xAuthToken string) ([]Post, error) {
 	var err error
 	retries := 0
 	for more {
-		csp, more, err = bc.GetPosts(context, xAuthToken, page)
+		csp, more, err = bc.GetPosts(page)
 		if err != nil {
-			log.Println(err)
 			retries++
 			if retries > bc.MaxRetries {
 				log.Println("Max retries reached")
@@ -51,28 +49,24 @@ func (bc *BigCommerce) GetAllPosts(context, xAuthToken string) ([]Post, error) {
 		cs = append(cs, csp...)
 		page++
 	}
-	return cs, nil
+	return cs, err
 }
 
 // GetPosts downloads all posts from BigCommerce, handling pagination
 // context: the BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store hash
 // xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials (see AuthContext)
 // page: the page number to download
-func (bc *BigCommerce) GetPosts(context, xAuthToken string, page int) ([]Post, bool, error) {
-	url := context + "/v2/blog/posts?limit=250&page=" + strconv.Itoa(page)
+func (bc *BigCommerce) GetPosts(page int) ([]Post, bool, error) {
+	url := "/v2/blog/posts?limit=250&page=" + strconv.Itoa(page)
 
-	req := bc.getAPIRequest(http.MethodGet, url, xAuthToken, nil)
-	res, err := bc.DefaultClient.Do(req)
+	req := bc.getAPIRequest(http.MethodGet, url, nil)
+	res, err := bc.HTTPClient.Do(req)
 	if err != nil {
 		return nil, false, err
 	}
 
 	defer res.Body.Close()
-	if res.StatusCode == http.StatusNoContent {
-		return nil, false, ErrNoContent
-	}
-
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := processBody(res)
 	if err != nil {
 		return nil, false, err
 	}

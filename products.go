@@ -2,6 +2,7 @@ package bigcommerce
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -141,9 +142,7 @@ func (bc *BigCommerce) SetProductInclude(subresources []string) {
 }
 
 // GetAllProducts gets all products from BigCommerce
-// context: the BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store hash
-// xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials (see AuthContext)
-func (bc *BigCommerce) GetAllProducts(context, xAuthToken string) ([]Product, error) {
+func (bc *BigCommerce) GetAllProducts() ([]Product, error) {
 	ps := []Product{}
 	var psp []Product
 	page := 1
@@ -151,9 +150,8 @@ func (bc *BigCommerce) GetAllProducts(context, xAuthToken string) ([]Product, er
 	var err error
 	retries := 0
 	for more {
-		psp, more, err = bc.GetProducts(context, xAuthToken, page)
+		psp, more, err = bc.GetProducts(page)
 		if err != nil {
-			log.Println(err)
 			retries++
 			if retries > bc.MaxRetries {
 				log.Println("Max retries reached")
@@ -164,14 +162,12 @@ func (bc *BigCommerce) GetAllProducts(context, xAuthToken string) ([]Product, er
 		ps = append(ps, psp...)
 		page++
 	}
-	return ps, nil
+	return ps, err
 }
 
 // GetProducts gets a page of products from BigCommerce
-// context: the BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store hash
-// xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials (see AuthContext)
 // page: the page number to download
-func (bc *BigCommerce) GetProducts(context, xAuthToken string, page int) ([]Product, bool, error) {
+func (bc *BigCommerce) GetProducts(page int) ([]Product, bool, error) {
 	fpart := ""
 	if len(productFields) != 0 {
 		fpart = "&include_fields=" + strings.Join(productFields, ",")
@@ -179,10 +175,10 @@ func (bc *BigCommerce) GetProducts(context, xAuthToken string, page int) ([]Prod
 	if len(productInclude) != 0 {
 		fpart = "&include=" + strings.Join(productInclude, ",")
 	}
-	url := context + "/v3/catalog/products?page=" + strconv.Itoa(page) + fpart
+	url := "/v3/catalog/products?page=" + strconv.Itoa(page) + fpart
 
-	req := bc.getAPIRequest(http.MethodGet, url, xAuthToken, nil)
-	res, err := bc.DefaultClient.Do(req)
+	req := bc.getAPIRequest(http.MethodGet, url, nil)
+	res, err := bc.HTTPClient.Do(req)
 	if err != nil {
 		return nil, false, err
 	}
@@ -196,8 +192,10 @@ func (bc *BigCommerce) GetProducts(context, xAuthToken string, page int) ([]Prod
 		return nil, false, err
 	}
 	var pp struct {
-		Data []Product `json:"data,omitempty"`
-		Meta struct {
+		Status int       `json:"status"`
+		Title  string    `json:"title"`
+		Data   []Product `json:"data,omitempty"`
+		Meta   struct {
 			Pagination struct {
 				Total       int64       `json:"total,omitempty"`
 				Count       int64       `json:"count,omitempty"`
@@ -213,29 +211,28 @@ func (bc *BigCommerce) GetProducts(context, xAuthToken string, page int) ([]Prod
 	if err != nil {
 		return nil, false, err
 	}
+	if pp.Status != 0 {
+		return nil, false, errors.New(pp.Title)
+	}
 	return pp.Data, pp.Meta.Pagination.CurrentPage < pp.Meta.Pagination.TotalPages, nil
 }
 
 // GetProductByID gets a product from BigCommerce by ID
-// context: the BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store hash
 // productID: BigCommerce product ID to get
-// xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials (see AuthContext)
-func (bc *BigCommerce) GetProductByID(context string, productID int64, xAuthToken string) (*Product, error) {
-	url := context + "/v3/catalog/products/" + strconv.FormatInt(productID, 10)
-	req := bc.getAPIRequest(http.MethodGet, url, xAuthToken, nil)
-	res, err := bc.DefaultClient.Do(req)
+func (bc *BigCommerce) GetProductByID(productID int64, xAuthToken string) (*Product, error) {
+	url := "/v3/catalog/products/" + strconv.FormatInt(productID, 10)
+	req := bc.getAPIRequest(http.MethodGet, url, nil)
+	res, err := bc.HTTPClient.Do(req)
 	if err != nil {
 		return nil, err
-	}
-	defer res.Body.Close()
-	if res.StatusCode == http.StatusNoContent {
-		return nil, ErrNoContent
 	}
 
-	body, err := ioutil.ReadAll(res.Body)
+	defer res.Body.Close()
+	body, err := processBody(res)
 	if err != nil {
 		return nil, err
 	}
+
 	var product Product
 	err = json.Unmarshal(body, &product)
 	if err != nil {

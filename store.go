@@ -60,17 +60,22 @@ type StoreInfo struct {
 	} `json:"features"`
 }
 
-// context: the BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store hash
-// xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials (see AuthContext)
+// GetStoreInfo returns the store info for the current store
 // page: the page number to download
-func (bc *BigCommerce) GetStoreInfo(context, xAuthToken string) (StoreInfo, error) {
+func (bc *BigCommerce) GetStoreInfo() (StoreInfo, error) {
 	var storeInfo StoreInfo
-	req := bc.getAPIRequest(http.MethodGet, context+"/v2/store", xAuthToken, nil)
-	res, err := bc.DefaultClient.Do(req)
+	req := bc.getAPIRequest(http.MethodGet, "/v2/store", nil)
+	res, err := bc.HTTPClient.Do(req)
 	if err != nil {
 		return storeInfo, err
 	}
 	defer res.Body.Close()
-	err = json.NewDecoder(res.Body).Decode(&storeInfo)
+
+	body, err := processBody(res)
+	if err != nil {
+		return storeInfo, err
+	}
+
+	err = json.Unmarshal(body, &storeInfo)
 	return storeInfo, err
 }
