@@ -219,7 +219,7 @@ func (bc *BigCommerce) GetProducts(page int) ([]Product, bool, error) {
 
 // GetProductByID gets a product from BigCommerce by ID
 // productID: BigCommerce product ID to get
-func (bc *BigCommerce) GetProductByID(productID int64, xAuthToken string) (*Product, error) {
+func (bc *BigCommerce) GetProductByID(productID int64) (*Product, error) {
 	url := "/v3/catalog/products/" + strconv.FormatInt(productID, 10)
 	req := bc.getAPIRequest(http.MethodGet, url, nil)
 	res, err := bc.HTTPClient.Do(req)
