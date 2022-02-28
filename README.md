@@ -23,7 +23,17 @@ func main() {
     }
 }
 ```
+
+## Errors
+
+```go
+var ErrNoContent = errors.New("no content 204 from BigCommerce API")
+var ErrNoMainThumbnail = errors.New("no main thumbnail")
+var ErrNotFound = errors.New("404 not found")
+```
+
 ## Types
+
 
 #### type AuthContext
 
@@ -102,24 +112,34 @@ func NewClient(storeHash, xAuthToken string) *BigCommerce
 ```go
 func (bc *BigCommerce) AddItems(cartID string, items []LineItem) (*Cart, error)
 ```
+AddItem adds line items to a cart
 
 #### func (*BigCommerce) CreateCart
 
 ```go
 func (bc *BigCommerce) CreateCart(items []LineItem) (*Cart, error)
 ```
+CreateCart creates a new cart in BigCommerce and returns it
 
 #### func (*BigCommerce) DeleteItem
 
 ```go
 func (bc *BigCommerce) DeleteItem(cartID string, item LineItem) (*Cart, error)
 ```
+DeleteItem deletes a line item from a cart, returns the updated cart Arguments:
+
+    cartID: the cart ID
+    item: the line item, must have an existing line item ID
 
 #### func (*BigCommerce) EditItem
 
 ```go
 func (bc *BigCommerce) EditItem(cartID string, item LineItem) (*Cart, error)
 ```
+EditItem edits a line item in a cart, returns the updated cart Arguments:
+
+    cartID: the cart ID
+    item: the line item to edit. Must have an ID, quantity, and product ID
 
 #### func (*BigCommerce) GetAllBrands
 
@@ -173,6 +193,7 @@ xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials
 ```go
 func (bc *BigCommerce) GetCart(cartID string) (*Cart, error)
 ```
+GetCart gets a cart by ID from BigCommerce and returns it
 
 #### func (*BigCommerce) GetCategories
 
@@ -345,6 +366,7 @@ type Cart struct {
 }
 ```
 
+Cart is a BigCommerce cart object
 
 #### type Category
 
@@ -506,6 +528,7 @@ type LineItem struct {
 }
 ```
 
+LineItem is a BigCommerce line item object for cart
 
 #### type LoadContext
 

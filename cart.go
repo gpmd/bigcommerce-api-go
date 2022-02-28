@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// Cart is a BigCommerce cart object
 type Cart struct {
 	ID         string `json:"id"`
 	CustomerID int64  `json:"customer_id,omitempty"`
@@ -33,6 +34,7 @@ type Cart struct {
 	Locale      string    `json:"locale,omitempty"`
 }
 
+// LineItem is a BigCommerce line item object for cart
 type LineItem struct {
 	ID                string     `json:"id,omitempty"`
 	ParentID          int64      `json:"parent_id,omitempty"`
@@ -56,6 +58,7 @@ type LineItem struct {
 	IsMutable         bool       `json:"is_mutable,omitempty"`
 }
 
+// CreateCart creates a new cart in BigCommerce and returns it
 func (bc *BigCommerce) CreateCart(items []LineItem) (*Cart, error) {
 	var body []byte
 	body, _ = json.Marshal(map[string]interface{}{
@@ -83,6 +86,7 @@ func (bc *BigCommerce) CreateCart(items []LineItem) (*Cart, error) {
 	return &cartResponse.Data, nil
 }
 
+// GetCart gets a cart by ID from BigCommerce and returns it
 func (bc *BigCommerce) GetCart(cartID string) (*Cart, error) {
 	req := bc.getAPIRequest(http.MethodGet, "/v3/carts/"+cartID, nil)
 	res, err := bc.HTTPClient.Do(req)
@@ -105,6 +109,7 @@ func (bc *BigCommerce) GetCart(cartID string) (*Cart, error) {
 	return &cartResponse.Data, nil
 }
 
+// AddItem adds line items to a cart
 func (bc *BigCommerce) AddItems(cartID string, items []LineItem) (*Cart, error) {
 	var body []byte
 	body, _ = json.Marshal(map[string]interface{}{
@@ -131,6 +136,10 @@ func (bc *BigCommerce) AddItems(cartID string, items []LineItem) (*Cart, error) 
 	return &cartResponse.Data, nil
 }
 
+// EditItem edits a line item in a cart, returns the updated cart
+// Arguments:
+// 		cartID: the cart ID
+// 		item: the line item to edit. Must have an ID, quantity, and product ID
 func (bc *BigCommerce) EditItem(cartID string, item LineItem) (*Cart, error) {
 	var body []byte
 	body, _ = json.Marshal(map[string]interface{}{
@@ -148,6 +157,10 @@ func (bc *BigCommerce) EditItem(cartID string, item LineItem) (*Cart, error) {
 	return bc.GetCart(cartID)
 }
 
+// DeleteItem deletes a line item from a cart, returns the updated cart
+// Arguments:
+// 		cartID: the cart ID
+// 		item: the line item, must have an existing line item ID
 func (bc *BigCommerce) DeleteItem(cartID string, item LineItem) (*Cart, error) {
 	req := bc.getAPIRequest(http.MethodDelete, "/v3/carts/"+cartID+"/items/"+item.ID, nil)
 	res, err := bc.HTTPClient.Do(req)
