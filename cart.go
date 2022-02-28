@@ -129,3 +129,33 @@ func (bc *BigCommerce) AddItems(cartID string, items []LineItem) (*Cart, error) 
 	}
 	return &cartResponse.Data, nil
 }
+
+func (bc *BigCommerce) EditItem(cartID string, item LineItem) (*Cart, error) {
+	var body []byte
+	body, _ = json.Marshal(map[string]interface{}{
+		"line_item": item,
+	})
+	req := bc.getAPIRequest(http.MethodPut, "/v3/carts/"+cartID+"/items/"+item.ID, bytes.NewReader(body))
+	res, err := bc.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	_, err = processBody(res)
+	if err != nil {
+		return nil, err
+	}
+	return bc.GetCart(cartID)
+}
+
+func (bc *BigCommerce) DeleteItem(cartID string, item LineItem) (*Cart, error) {
+	req := bc.getAPIRequest(http.MethodDelete, "/v3/carts/"+cartID+"/items/"+item.ID, nil)
+	res, err := bc.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	_, err = processBody(res)
+	if err != nil {
+		return nil, err
+	}
+	return bc.GetCart(cartID)
+}
