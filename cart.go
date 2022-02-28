@@ -3,6 +3,7 @@ package bigcommerce
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -140,9 +141,9 @@ func (bc *BigCommerce) EditItem(cartID string, item LineItem) (*Cart, error) {
 	if err != nil {
 		return nil, err
 	}
-	_, err = processBody(res)
+	b, err := processBody(res)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s", string(b))
 	}
 	return bc.GetCart(cartID)
 }

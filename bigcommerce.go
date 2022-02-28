@@ -91,10 +91,13 @@ func processBody(res *http.Response) ([]byte, error) {
 	if res.StatusCode == http.StatusNotFound {
 		return nil, ErrNotFound
 	}
-
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
+	}
+	res.Body.Close()
+	if res.StatusCode > 299 {
+		return body, errors.New(res.Status)
 	}
 	return body, nil
 }
