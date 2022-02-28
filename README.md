@@ -86,6 +86,7 @@ type BigCommerce struct {
 	XAuthToken string `json:"x-auth-token"`
 	MaxRetries int
 	HTTPClient *http.Client
+	ChannelID  int
 }
 ```
 
@@ -94,6 +95,30 @@ type BigCommerce struct {
 
 ```go
 func NewClient(storeHash, xAuthToken string) *BigCommerce
+```
+
+#### func (*BigCommerce) AddItems
+
+```go
+func (bc *BigCommerce) AddItems(cartID string, items []LineItem) (*Cart, error)
+```
+
+#### func (*BigCommerce) CreateCart
+
+```go
+func (bc *BigCommerce) CreateCart(items []LineItem) (*Cart, error)
+```
+
+#### func (*BigCommerce) DeleteItem
+
+```go
+func (bc *BigCommerce) DeleteItem(cartID string, item LineItem) (*Cart, error)
+```
+
+#### func (*BigCommerce) EditItem
+
+```go
+func (bc *BigCommerce) EditItem(cartID string, item LineItem) (*Cart, error)
 ```
 
 #### func (*BigCommerce) GetAllBrands
@@ -109,6 +134,12 @@ GetAllBrands returns all brands, handling pagination
 func (bc *BigCommerce) GetAllCategories() ([]Category, error)
 ```
 GetAllCategories returns a list of categories, handling pagination
+
+#### func (*BigCommerce) GetAllChannels
+
+```go
+func (bc *BigCommerce) GetAllChannels() ([]Channel, error)
+```
 
 #### func (*BigCommerce) GetAllPosts
 
@@ -137,6 +168,12 @@ context (e.g. stores/23412341234) where 23412341234 is the store hash
 xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials
 (see AuthContext) page: the page number to download
 
+#### func (*BigCommerce) GetCart
+
+```go
+func (bc *BigCommerce) GetCart(cartID string) (*Cart, error)
+```
+
 #### func (*BigCommerce) GetCategories
 
 ```go
@@ -144,6 +181,12 @@ func (bc *BigCommerce) GetCategories(page int) ([]Category, bool, error)
 ```
 GetCategories returns a list of categories, handling pagination page: the page
 number to download
+
+#### func (*BigCommerce) GetChannels
+
+```go
+func (bc *BigCommerce) GetChannels(page int) ([]Channel, bool, error)
+```
 
 #### func (*BigCommerce) GetMainThumbnailURL
 
@@ -166,7 +209,7 @@ credentials (see AuthContext) page: the page number to download
 #### func (*BigCommerce) GetProductByID
 
 ```go
-func (bc *BigCommerce) GetProductByID(productID int64, xAuthToken string) (*Product, error)
+func (bc *BigCommerce) GetProductByID(productID int64) (*Product, error)
 ```
 GetProductByID gets a product from BigCommerce by ID productID: BigCommerce
 product ID to get
@@ -212,6 +255,7 @@ type BigCommerceApp struct {
 	AppClientSecret string
 	HTTPClient      *http.Client
 	MaxRetries      int
+	ChannelID       int
 }
 ```
 
@@ -272,6 +316,36 @@ type Brand struct {
 
 Brand is BigCommerce brand object
 
+#### type Cart
+
+```go
+type Cart struct {
+	ID         string `json:"id"`
+	CustomerID int64  `json:"customer_id,omitempty"`
+	ChannelID  int64  `json:"channel_id,omitempty"`
+	Email      string `json:"email,omitempty"`
+	Currency   struct {
+		Code string `json:"code,omitempty"`
+	} `json:"currency,omitempty"`
+	TaxIncluded    bool       `json:"tax_included,omitempty"`
+	BaseAmount     float64    `json:"base_amount,omitempty"`
+	DiscountAmount float64    `json:"discount_amount,omitempty"`
+	CartAmount     float64    `json:"cart_amount,omitempty"`
+	Discounts      []Discount `json:"discounts,omitempty"`
+	Coupons        []Coupon   `json:"coupons,omitempty"`
+	LineItems      struct {
+		PhysicalItems    []LineItem `json:"physical_items,omitempty"`
+		DigitalItems     []LineItem `json:"digital_items,omitempty"`
+		GiftCertificates []LineItem `json:"gift_certificates,omitempty"`
+		CustomItems      []LineItem `json:"custom_items,omitempty"`
+	} `json:"line_items"`
+	CreatedTime time.Time `json:"created_time,omitempty"`
+	UpdatedTime time.Time `json:"updated_time,omitempty"`
+	Locale      string    `json:"locale,omitempty"`
+}
+```
+
+
 #### type Category
 
 ```go
@@ -291,6 +365,26 @@ type Category struct {
 
 Category is a BC category object
 
+#### type Channel
+
+```go
+type Channel struct {
+	IconURL          string    `json:"icon_url"`
+	IsListableFromUI bool      `json:"is_listable_from_ui"`
+	IsVisible        bool      `json:"is_visible"`
+	DateCreated      time.Time `json:"date_created"`
+	ExternalID       string    `json:"external_id"`
+	Type             string    `json:"type"`
+	Platform         string    `json:"platform"`
+	IsEnabled        bool      `json:"is_enabled"`
+	DateModified     time.Time `json:"date_modified"`
+	Name             string    `json:"name"`
+	ID               int       `json:"id"`
+	Status           string    `json:"status"`
+}
+```
+
+
 #### type ClientRequest
 
 ```go
@@ -304,6 +398,18 @@ type ClientRequest struct {
 
 ClientRequest is a BigCommerce client request object that comes with most App
 callbacks in the GET request signed_payload parameter
+
+#### type Coupon
+
+```go
+type Coupon struct {
+	Code             string  `json:"code"`
+	ID               string  `json:"id"`
+	CouponType       string  `json:"coupon_type"`
+	DiscountedAmount float64 `json:"discounted_amount"`
+}
+```
+
 
 #### type Customer
 
@@ -331,6 +437,16 @@ type Customer struct {
 
 Customer is a struct for the BigCommerce Customer API
 
+#### type Discount
+
+```go
+type Discount struct {
+	ID               string  `json:"id"`
+	DiscountedAmount float64 `json:"discounted_amount"`
+}
+```
+
+
 #### type Image
 
 ```go
@@ -350,6 +466,46 @@ type Image struct {
 ```
 
 Image is entry for BC product images
+
+#### type InventoryEntry
+
+```go
+type InventoryEntry struct {
+	ProductID int64   `json:"product_id"`
+	Method    string  `json:"method"`
+	Value     float64 `json:"value"`
+	VariantID int64   `json:"variant_id"`
+}
+```
+
+
+#### type LineItem
+
+```go
+type LineItem struct {
+	ID                string     `json:"id,omitempty"`
+	ParentID          int64      `json:"parent_id,omitempty"`
+	VariantID         int64      `json:"variant_id,omitempty"`
+	ProductID         int64      `json:"product_id,omitempty"`
+	Sku               string     `json:"sku,omitempty"`
+	Name              string     `json:"name,omitempty"`
+	URL               string     `json:"url,omitempty"`
+	Quantity          float64    `json:"quantity,omitempty"`
+	Taxable           bool       `json:"taxable,omitempty"`
+	ImageURL          string     `json:"image_url,omitempty"`
+	Discounts         []Discount `json:"discounts,omitempty"`
+	Coupons           []Coupon   `json:"coupons,omitempty"`
+	DiscountAmount    float64    `json:"discount_amount,omitempty"`
+	CouponAmount      float64    `json:"coupon_amount,omitempty"`
+	ListPrice         float64    `json:"list_price,omitempty"`
+	SalePrice         float64    `json:"sale_price,omitempty"`
+	ExtendedListPrice float64    `json:"extended_list_price,omitempty"`
+	ExtendedSalePrice float64    `json:"extended_sale_price,omitempty"`
+	IsRequireShipping bool       `json:"is_require_shipping,omitempty"`
+	IsMutable         bool       `json:"is_mutable,omitempty"`
+}
+```
+
 
 #### type LoadContext
 
@@ -584,12 +740,33 @@ responses
 
 ```go
 type WebhookPayload struct {
-	Scope     string                 `json:"scope"`
-	StoreID   string                 `json:"store_id"`
-	Data      map[string]interface{} `json:"data"`
-	Hash      string                 `json:"hash"`
-	CreatedAt string                 `json:"created_at"`
-	Producer  string                 `json:"producer"`
+	Scope   string `json:"scope"`
+	StoreID string `json:"store_id"`
+	Data    struct {
+		Type     string `json:"type"`
+		ID       int64  `json:"id"`
+		CouponID string `json:"couponId"`
+		CartID   string `json:"cartId"`
+		OrderID  int64  `json:"orderId"`
+		Address  struct {
+			CustomerID int64 `json:"customer_id"`
+		} `json:"address"`
+		Inventory InventoryEntry `json:"inventory"`
+		Message   struct {
+			OrderMessageID int64 `json:"order_message_id"`
+		} `json:"message"`
+		Sku struct {
+			ProductID int64 `json:"product_id"`
+			VariantID int64 `json:"variant_id"`
+		} `json:"sku"`
+		Status struct {
+			PreviousStatusID int64 `json:"previous_status_id"`
+			NewStatusID      int64 `json:"new_status_id"`
+		} `json:"status"`
+	} `json:"data"`
+	Hash      string `json:"hash"`
+	CreatedAt int64  `json:"created_at"`
+	Producer  string `json:"producer"`
 }
 ```
 
