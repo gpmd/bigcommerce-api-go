@@ -52,3 +52,10 @@ type ClientRequest struct {
 	Context   string   `json:"context"`
 	StoreHash string   `json:"store_hash"`
 }
+
+type InventoryEntry struct {
+	ProductID int64   `json:"product_id"`
+	Method    string  `json:"method"`
+	Value     float64 `json:"value"`
+	VariantID int64   `json:"variant_id"`
+}

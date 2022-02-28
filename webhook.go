@@ -18,13 +18,8 @@ type WebhookPayload struct {
 		Address  struct {
 			CustomerID int64 `json:"customer_id"`
 		} `json:"address"`
-		Inventory struct {
-			ProductID int64   `json:"product_id"`
-			Method    string  `json:"method"`
-			Value     float64 `json:"value"`
-			VariantID int64   `json:"variant_id"`
-		} `json:"inventory"`
-		Message struct {
+		Inventory InventoryEntry `json:"inventory"`
+		Message   struct {
 			OrderMessageID int64 `json:"order_message_id"`
 		} `json:"message"`
 		Sku struct {
