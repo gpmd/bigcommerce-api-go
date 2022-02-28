@@ -18,6 +18,7 @@ type BigCommerceApp struct {
 	AppClientSecret string
 	HTTPClient      *http.Client
 	MaxRetries      int
+	ChannelID       int
 }
 
 type BigCommerce struct {
@@ -25,6 +26,7 @@ type BigCommerce struct {
 	XAuthToken string `json:"x-auth-token"`
 	MaxRetries int
 	HTTPClient *http.Client
+	ChannelID  int
 }
 
 var ErrNoContent = errors.New("no content 204 from BigCommerce API")
@@ -59,6 +61,7 @@ func NewClient(storeHash, xAuthToken string) *BigCommerce {
 		HTTPClient: &http.Client{
 			Timeout: time.Second * 10,
 		},
+		ChannelID: 1,
 	}
 }
 

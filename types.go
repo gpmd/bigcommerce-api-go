@@ -59,3 +59,15 @@ type InventoryEntry struct {
 	Value     float64 `json:"value"`
 	VariantID int64   `json:"variant_id"`
 }
+
+type Coupon struct {
+	Code             string  `json:"code"`
+	ID               string  `json:"id"`
+	CouponType       string  `json:"coupon_type"`
+	DiscountedAmount float64 `json:"discounted_amount"`
+}
+
+type Discount struct {
+	ID               string  `json:"id"`
+	DiscountedAmount float64 `json:"discounted_amount"`
+}
