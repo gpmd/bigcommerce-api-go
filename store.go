@@ -62,7 +62,7 @@ type StoreInfo struct {
 
 // GetStoreInfo returns the store info for the current store
 // page: the page number to download
-func (bc *BigCommerce) GetStoreInfo() (StoreInfo, error) {
+func (bc *Client) GetStoreInfo() (StoreInfo, error) {
 	var storeInfo StoreInfo
 	req := bc.getAPIRequest(http.MethodGet, "/v2/store", nil)
 	res, err := bc.HTTPClient.Do(req)

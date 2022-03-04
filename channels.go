@@ -25,7 +25,7 @@ type Channel struct {
 	Status           string    `json:"status"`
 }
 
-func (bc *BigCommerce) GetAllChannels() ([]Channel, error) {
+func (bc *Client) GetAllChannels() ([]Channel, error) {
 	cs := []Channel{}
 	var csp []Channel
 	page := 1
@@ -48,7 +48,7 @@ func (bc *BigCommerce) GetAllChannels() ([]Channel, error) {
 	return cs, err
 }
 
-func (bc *BigCommerce) GetChannels(page int) ([]Channel, bool, error) {
+func (bc *Client) GetChannels(page int) ([]Channel, bool, error) {
 	url := "/v3/channels?page=" + strconv.Itoa(page)
 
 	req := bc.getAPIRequest(http.MethodGet, url, nil)

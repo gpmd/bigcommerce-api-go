@@ -27,7 +27,7 @@ type Customer struct {
 	Addresses        map[string]string `json:"addresses"`
 }
 
-func (bc *BigCommerce) ValidateCredentials(email, password string) (int64, error) {
+func (bc *Client) ValidateCredentials(email, password string) (int64, error) {
 	var credReq struct {
 		Email     string `json:"email"`
 		Password  string `json:"password"`

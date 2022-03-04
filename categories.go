@@ -22,7 +22,7 @@ type Category struct {
 }
 
 // GetAllCategories returns a list of categories, handling pagination
-func (bc *BigCommerce) GetAllCategories() ([]Category, error) {
+func (bc *Client) GetAllCategories() ([]Category, error) {
 	cs := []Category{}
 	var csp []Category
 	page := 1
@@ -55,7 +55,7 @@ func (bc *BigCommerce) GetAllCategories() ([]Category, error) {
 
 // GetCategories returns a list of categories, handling pagination
 // page: the page number to download
-func (bc *BigCommerce) GetCategories(page int) ([]Category, bool, error) {
+func (bc *Client) GetCategories(page int) ([]Category, bool, error) {
 	url := "/v3/catalog/categories?include_fields=name,parent_id,is_visible,custom_url&page=" + strconv.Itoa(page)
 
 	req := bc.getAPIRequest(http.MethodGet, url, nil)
@@ -91,7 +91,7 @@ func (bc *BigCommerce) GetCategories(page int) ([]Category, bool, error) {
 	return pp.Data, pp.Meta.Pagination.CurrentPage < pp.Meta.Pagination.TotalPages, nil
 }
 
-func (bc *BigCommerce) getFullCategoryName(cs []Category, i int, extidmap map[int64]int) string {
+func (bc *Client) getFullCategoryName(cs []Category, i int, extidmap map[int64]int) string {
 	if cs[i].ParentID == 0 {
 		return cs[i].Name
 	}

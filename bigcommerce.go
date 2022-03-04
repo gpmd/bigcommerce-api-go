@@ -12,7 +12,7 @@ import (
 
 // BigCommerce is the BigCommerce API client object for BigCommerce Apps
 // holds no client specific information
-type BigCommerceApp struct {
+type App struct {
 	Hostname        string
 	AppClientID     string
 	AppClientSecret string
@@ -21,7 +21,7 @@ type BigCommerceApp struct {
 	ChannelID       int
 }
 
-type BigCommerce struct {
+type Client struct {
 	StoreHash  string `json:"store-hash"`
 	XAuthToken string `json:"x-auth-token"`
 	MaxRetries int
@@ -41,8 +41,8 @@ type AuthContexter interface {
 // New returns a new BigCommerce API object with the given hostname, client ID, and client secret
 // The client ID and secret are the App's client ID and secret from the BigCommerce My Apps dashboard
 // The hostname is the domain name of the app from the same page (e.g. app.exampledomain.com)
-func NewApp(hostname, appClientID, appClientSecret string) *BigCommerceApp {
-	return &BigCommerceApp{
+func NewApp(hostname, appClientID, appClientSecret string) *App {
+	return &App{
 		Hostname:        hostname,
 		AppClientID:     appClientID,
 		AppClientSecret: appClientSecret,
@@ -53,8 +53,8 @@ func NewApp(hostname, appClientID, appClientSecret string) *BigCommerceApp {
 	}
 }
 
-func NewClient(storeHash, xAuthToken string) *BigCommerce {
-	return &BigCommerce{
+func NewClient(storeHash, xAuthToken string) *Client {
+	return &Client{
 		StoreHash:  storeHash,
 		XAuthToken: xAuthToken,
 		MaxRetries: 1,
@@ -65,7 +65,7 @@ func NewClient(storeHash, xAuthToken string) *BigCommerce {
 	}
 }
 
-func (bc *BigCommerce) getAPIRequest(method, url string, body io.Reader) *http.Request {
+func (bc *Client) getAPIRequest(method, url string, body io.Reader) *http.Request {
 	if !strings.HasPrefix(url, "/") {
 		url = "/" + url
 	}

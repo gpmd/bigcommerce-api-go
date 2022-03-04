@@ -132,17 +132,17 @@ type Product struct {
 }
 
 // SetProductFields sets include_fields parameter for GetProducts, empty list will get all fields
-func (bc *BigCommerce) SetProductFields(fields []string) {
+func (bc *Client) SetProductFields(fields []string) {
 	productFields = fields
 }
 
 // SetProductFields sets include_fields parameter for GetProducts, empty list will get all fields
-func (bc *BigCommerce) SetProductInclude(subresources []string) {
+func (bc *Client) SetProductInclude(subresources []string) {
 	productInclude = subresources
 }
 
 // GetAllProducts gets all products from BigCommerce
-func (bc *BigCommerce) GetAllProducts() ([]Product, error) {
+func (bc *Client) GetAllProducts() ([]Product, error) {
 	ps := []Product{}
 	var psp []Product
 	page := 1
@@ -167,7 +167,7 @@ func (bc *BigCommerce) GetAllProducts() ([]Product, error) {
 
 // GetProducts gets a page of products from BigCommerce
 // page: the page number to download
-func (bc *BigCommerce) GetProducts(page int) ([]Product, bool, error) {
+func (bc *Client) GetProducts(page int) ([]Product, bool, error) {
 	fpart := ""
 	if len(productFields) != 0 {
 		fpart = "&include_fields=" + strings.Join(productFields, ",")
@@ -219,7 +219,7 @@ func (bc *BigCommerce) GetProducts(page int) ([]Product, bool, error) {
 
 // GetProductByID gets a product from BigCommerce by ID
 // productID: BigCommerce product ID to get
-func (bc *BigCommerce) GetProductByID(productID int64) (*Product, error) {
+func (bc *Client) GetProductByID(productID int64) (*Product, error) {
 	url := "/v3/catalog/products/" + strconv.FormatInt(productID, 10)
 	req := bc.getAPIRequest(http.MethodGet, url, nil)
 	res, err := bc.HTTPClient.Do(req)

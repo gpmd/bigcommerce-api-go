@@ -24,7 +24,7 @@ type Image struct {
 
 // GetMainThumbnailURL returns the main thumbnail URL for a product
 // this is due to the fact that the Product API does not return the main thumbnail URL
-func (bc *BigCommerce) GetMainThumbnailURL(productID int64) (string, error) {
+func (bc *Client) GetMainThumbnailURL(productID int64) (string, error) {
 	url := "/v3/catalog/products/" + strconv.FormatInt(productID, 10) + "/images"
 
 	req := bc.getAPIRequest(http.MethodGet, url, nil)

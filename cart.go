@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -59,7 +60,7 @@ type LineItem struct {
 }
 
 // CreateCart creates a new cart in BigCommerce and returns it
-func (bc *BigCommerce) CreateCart(items []LineItem) (*Cart, error) {
+func (bc *Client) CreateCart(items []LineItem) (*Cart, error) {
 	var body []byte
 	body, _ = json.Marshal(map[string]interface{}{
 		"channel_id": bc.ChannelID,
@@ -87,7 +88,7 @@ func (bc *BigCommerce) CreateCart(items []LineItem) (*Cart, error) {
 }
 
 // GetCart gets a cart by ID from BigCommerce and returns it
-func (bc *BigCommerce) GetCart(cartID string) (*Cart, error) {
+func (bc *Client) GetCart(cartID string) (*Cart, error) {
 	req := bc.getAPIRequest(http.MethodGet, "/v3/carts/"+cartID, nil)
 	res, err := bc.HTTPClient.Do(req)
 	if err != nil {
@@ -109,8 +110,8 @@ func (bc *BigCommerce) GetCart(cartID string) (*Cart, error) {
 	return &cartResponse.Data, nil
 }
 
-// AddItem adds line items to a cart
-func (bc *BigCommerce) AddItems(cartID string, items []LineItem) (*Cart, error) {
+// CartAddItem adds line items to a cart
+func (bc *Client) CartAddItems(cartID string, items []LineItem) (*Cart, error) {
 	var body []byte
 	body, _ = json.Marshal(map[string]interface{}{
 		"line_items": items,
@@ -140,7 +141,7 @@ func (bc *BigCommerce) AddItems(cartID string, items []LineItem) (*Cart, error) 
 // Arguments:
 // 		cartID: the cart ID
 // 		item: the line item to edit. Must have an ID, quantity, and product ID
-func (bc *BigCommerce) EditItem(cartID string, item LineItem) (*Cart, error) {
+func (bc *Client) CartEditItem(cartID string, item LineItem) (*Cart, error) {
 	var body []byte
 	body, _ = json.Marshal(map[string]interface{}{
 		"line_item": item,
@@ -161,7 +162,7 @@ func (bc *BigCommerce) EditItem(cartID string, item LineItem) (*Cart, error) {
 // Arguments:
 // 		cartID: the cart ID
 // 		item: the line item, must have an existing line item ID
-func (bc *BigCommerce) DeleteItem(cartID string, item LineItem) (*Cart, error) {
+func (bc *Client) CartDeleteItem(cartID string, item LineItem) (*Cart, error) {
 	req := bc.getAPIRequest(http.MethodDelete, "/v3/carts/"+cartID+"/items/"+item.ID, nil)
 	res, err := bc.HTTPClient.Do(req)
 	if err != nil {
@@ -172,4 +173,29 @@ func (bc *BigCommerce) DeleteItem(cartID string, item LineItem) (*Cart, error) {
 		return nil, err
 	}
 	return bc.GetCart(cartID)
+}
+
+// CartUpdateCustomerID updates the customer ID for a cart
+// Arguments:
+// 		cartID: the BigCommerce cart ID
+// 		customerID: the new BigCommerce customer ID
+func (bc *Client) CartUpdateCustomerID(cartID string, customerID string) (*Cart, error) {
+	req := bc.getAPIRequest(http.MethodPut, "/v3/carts/"+cartID,
+		bytes.NewReader([]byte(fmt.Sprintf(`{"customer_id": %s}`, customerID))))
+	res, err := bc.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	b, err := processBody(res)
+	if err != nil {
+		return nil, err
+	}
+	var cartResponse struct {
+		ID int64 `json:"id"`
+	}
+	err = json.Unmarshal(b, &cartResponse)
+	if err != nil {
+		return nil, err
+	}
+	return bc.GetCart(strconv.FormatInt(cartResponse.ID, 10))
 }
