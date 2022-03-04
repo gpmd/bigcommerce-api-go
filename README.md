@@ -34,6 +34,54 @@ var ErrNotFound = errors.New("404 not found")
 
 ## Types
 
+#### type App
+
+```go
+type App struct {
+	Hostname        string
+	AppClientID     string
+	AppClientSecret string
+	HTTPClient      *http.Client
+	MaxRetries      int
+	ChannelID       int
+}
+```
+
+BigCommerce is the BigCommerce API client object for BigCommerce Apps holds no
+client specific information
+
+#### func  NewApp
+
+```go
+func NewApp(hostname, appClientID, appClientSecret string) *App
+```
+New returns a new BigCommerce API object with the given hostname, client ID, and
+client secret The client ID and secret are the App's client ID and secret from
+the BigCommerce My Apps dashboard The hostname is the domain name of the app
+from the same page (e.g. app.exampledomain.com)
+
+#### func (*App) CheckSignature
+
+```go
+func (bc *App) CheckSignature(signedPayload string) ([]byte, error)
+```
+CheckSignature checks the signature of the request whith SHA256 HMAC
+
+#### func (*App) GetAuthContext
+
+```go
+func (bc *App) GetAuthContext(requestURLQuery url.Values) (*AuthContext, error)
+```
+GetAuthContext returns an AuthContext object from the BigCommerce API Call it
+with r.URL.Query() - will return BigCommerce Auth Context or error
+
+#### func (*App) GetClientRequest
+
+```go
+func (bc *App) GetClientRequest(requestURLQuery url.Values) (*ClientRequest, error)
+```
+GetClientRequest returns a ClientRequest object from the BigCommerce API Call it
+with r.URL.Query() - will return BigCommerce Client Request or error
 
 #### type AuthContext
 
@@ -87,234 +135,6 @@ type BCUser struct {
 ```
 
 BCUser is a BigCommerce shorthand object type that's in many other responses
-
-#### type BigCommerce
-
-```go
-type BigCommerce struct {
-	StoreHash  string `json:"store-hash"`
-	XAuthToken string `json:"x-auth-token"`
-	MaxRetries int
-	HTTPClient *http.Client
-	ChannelID  int
-}
-```
-
-
-#### func  NewClient
-
-```go
-func NewClient(storeHash, xAuthToken string) *BigCommerce
-```
-
-#### func (*BigCommerce) AddItems
-
-```go
-func (bc *BigCommerce) AddItems(cartID string, items []LineItem) (*Cart, error)
-```
-AddItem adds line items to a cart
-
-#### func (*BigCommerce) CreateCart
-
-```go
-func (bc *BigCommerce) CreateCart(items []LineItem) (*Cart, error)
-```
-CreateCart creates a new cart in BigCommerce and returns it
-
-#### func (*BigCommerce) DeleteItem
-
-```go
-func (bc *BigCommerce) DeleteItem(cartID string, item LineItem) (*Cart, error)
-```
-DeleteItem deletes a line item from a cart, returns the updated cart Arguments:
-
-    cartID: the cart ID
-    item: the line item, must have an existing line item ID
-
-#### func (*BigCommerce) EditItem
-
-```go
-func (bc *BigCommerce) EditItem(cartID string, item LineItem) (*Cart, error)
-```
-EditItem edits a line item in a cart, returns the updated cart Arguments:
-
-    cartID: the cart ID
-    item: the line item to edit. Must have an ID, quantity, and product ID
-
-#### func (*BigCommerce) GetAllBrands
-
-```go
-func (bc *BigCommerce) GetAllBrands() ([]Brand, error)
-```
-GetAllBrands returns all brands, handling pagination
-
-#### func (*BigCommerce) GetAllCategories
-
-```go
-func (bc *BigCommerce) GetAllCategories() ([]Category, error)
-```
-GetAllCategories returns a list of categories, handling pagination
-
-#### func (*BigCommerce) GetAllChannels
-
-```go
-func (bc *BigCommerce) GetAllChannels() ([]Channel, error)
-```
-
-#### func (*BigCommerce) GetAllPosts
-
-```go
-func (bc *BigCommerce) GetAllPosts(context, xAuthToken string) ([]Post, error)
-```
-GetAllPosts downloads all posts from BigCommerce, handling pagination context:
-the BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store
-hash xAuthToken: the BigCommerce Store's X-Auth-Token coming from store
-credentials (see AuthContext)
-
-#### func (*BigCommerce) GetAllProducts
-
-```go
-func (bc *BigCommerce) GetAllProducts() ([]Product, error)
-```
-GetAllProducts gets all products from BigCommerce
-
-#### func (*BigCommerce) GetBrands
-
-```go
-func (bc *BigCommerce) GetBrands(page int) ([]Brand, bool, error)
-```
-GetBrands returns all brands, handling pagination context: the BigCommerce
-context (e.g. stores/23412341234) where 23412341234 is the store hash
-xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials
-(see AuthContext) page: the page number to download
-
-#### func (*BigCommerce) GetCart
-
-```go
-func (bc *BigCommerce) GetCart(cartID string) (*Cart, error)
-```
-GetCart gets a cart by ID from BigCommerce and returns it
-
-#### func (*BigCommerce) GetCategories
-
-```go
-func (bc *BigCommerce) GetCategories(page int) ([]Category, bool, error)
-```
-GetCategories returns a list of categories, handling pagination page: the page
-number to download
-
-#### func (*BigCommerce) GetChannels
-
-```go
-func (bc *BigCommerce) GetChannels(page int) ([]Channel, bool, error)
-```
-
-#### func (*BigCommerce) GetMainThumbnailURL
-
-```go
-func (bc *BigCommerce) GetMainThumbnailURL(productID int64) (string, error)
-```
-GetMainThumbnailURL returns the main thumbnail URL for a product this is due to
-the fact that the Product API does not return the main thumbnail URL
-
-#### func (*BigCommerce) GetPosts
-
-```go
-func (bc *BigCommerce) GetPosts(page int) ([]Post, bool, error)
-```
-GetPosts downloads all posts from BigCommerce, handling pagination context: the
-BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store
-hash xAuthToken: the BigCommerce Store's X-Auth-Token coming from store
-credentials (see AuthContext) page: the page number to download
-
-#### func (*BigCommerce) GetProductByID
-
-```go
-func (bc *BigCommerce) GetProductByID(productID int64) (*Product, error)
-```
-GetProductByID gets a product from BigCommerce by ID productID: BigCommerce
-product ID to get
-
-#### func (*BigCommerce) GetProducts
-
-```go
-func (bc *BigCommerce) GetProducts(page int) ([]Product, bool, error)
-```
-GetProducts gets a page of products from BigCommerce page: the page number to
-download
-
-#### func (*BigCommerce) GetStoreInfo
-
-```go
-func (bc *BigCommerce) GetStoreInfo() (StoreInfo, error)
-```
-GetStoreInfo returns the store info for the current store page: the page number
-to download
-
-#### func (*BigCommerce) SetProductFields
-
-```go
-func (bc *BigCommerce) SetProductFields(fields []string)
-```
-SetProductFields sets include_fields parameter for GetProducts, empty list will
-get all fields
-
-#### func (*BigCommerce) SetProductInclude
-
-```go
-func (bc *BigCommerce) SetProductInclude(subresources []string)
-```
-SetProductFields sets include_fields parameter for GetProducts, empty list will
-get all fields
-
-#### type BigCommerceApp
-
-```go
-type BigCommerceApp struct {
-	Hostname        string
-	AppClientID     string
-	AppClientSecret string
-	HTTPClient      *http.Client
-	MaxRetries      int
-	ChannelID       int
-}
-```
-
-BigCommerce is the BigCommerce API client object for BigCommerce Apps holds no
-client specific information
-
-#### func  NewApp
-
-```go
-func NewApp(hostname, appClientID, appClientSecret string) *BigCommerceApp
-```
-New returns a new BigCommerce API object with the given hostname, client ID, and
-client secret The client ID and secret are the App's client ID and secret from
-the BigCommerce My Apps dashboard The hostname is the domain name of the app
-from the same page (e.g. app.exampledomain.com)
-
-#### func (*BigCommerceApp) CheckSignature
-
-```go
-func (bc *BigCommerceApp) CheckSignature(signedPayload string) ([]byte, error)
-```
-CheckSignature checks the signature of the request whith SHA256 HMAC
-
-#### func (*BigCommerceApp) GetAuthContext
-
-```go
-func (bc *BigCommerceApp) GetAuthContext(requestURLQuery url.Values) (*AuthContext, error)
-```
-GetAuthContext returns an AuthContext object from the BigCommerce API Call it
-with r.URL.Query() - will return BigCommerce Auth Context or error
-
-#### func (*BigCommerceApp) GetClientRequest
-
-```go
-func (bc *BigCommerceApp) GetClientRequest(requestURLQuery url.Values) (*ClientRequest, error)
-```
-GetClientRequest returns a ClientRequest object from the BigCommerce API Call it
-with r.URL.Query() - will return BigCommerce Client Request or error
 
 #### type Brand
 
@@ -406,6 +226,199 @@ type Channel struct {
 }
 ```
 
+
+#### type Client
+
+```go
+type Client struct {
+	StoreHash  string `json:"store-hash"`
+	XAuthToken string `json:"x-auth-token"`
+	MaxRetries int
+	HTTPClient *http.Client
+	ChannelID  int
+}
+```
+
+
+#### func  NewClient
+
+```go
+func NewClient(storeHash, xAuthToken string) *Client
+```
+
+#### func (*Client) CartAddItems
+
+```go
+func (bc *Client) CartAddItems(cartID string, items []LineItem) (*Cart, error)
+```
+CartAddItem adds line items to a cart
+
+#### func (*Client) CartDeleteItem
+
+```go
+func (bc *Client) CartDeleteItem(cartID string, item LineItem) (*Cart, error)
+```
+DeleteItem deletes a line item from a cart, returns the updated cart Arguments:
+
+    cartID: the cart ID
+    item: the line item, must have an existing line item ID
+
+#### func (*Client) CartEditItem
+
+```go
+func (bc *Client) CartEditItem(cartID string, item LineItem) (*Cart, error)
+```
+EditItem edits a line item in a cart, returns the updated cart Arguments:
+
+    cartID: the cart ID
+    item: the line item to edit. Must have an ID, quantity, and product ID
+
+#### func (*Client) CartUpdateCustomerID
+
+```go
+func (bc *Client) CartUpdateCustomerID(cartID, customerID string) (*Cart, error)
+```
+CartUpdateCustomerID updates the customer ID for a cart Arguments: cartID: the
+BigCommerce cart ID customerID: the new BigCommerce customer ID
+
+#### func (*Client) CreateCart
+
+```go
+func (bc *Client) CreateCart(items []LineItem) (*Cart, error)
+```
+CreateCart creates a new cart in BigCommerce and returns it
+
+#### func (*Client) GetAllBrands
+
+```go
+func (bc *Client) GetAllBrands() ([]Brand, error)
+```
+GetAllBrands returns all brands, handling pagination
+
+#### func (*Client) GetAllCategories
+
+```go
+func (bc *Client) GetAllCategories() ([]Category, error)
+```
+GetAllCategories returns a list of categories, handling pagination
+
+#### func (*Client) GetAllChannels
+
+```go
+func (bc *Client) GetAllChannels() ([]Channel, error)
+```
+
+#### func (*Client) GetAllPosts
+
+```go
+func (bc *Client) GetAllPosts(context, xAuthToken string) ([]Post, error)
+```
+GetAllPosts downloads all posts from BigCommerce, handling pagination context:
+the BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store
+hash xAuthToken: the BigCommerce Store's X-Auth-Token coming from store
+credentials (see AuthContext)
+
+#### func (*Client) GetAllProducts
+
+```go
+func (bc *Client) GetAllProducts() ([]Product, error)
+```
+GetAllProducts gets all products from BigCommerce
+
+#### func (*Client) GetBrands
+
+```go
+func (bc *Client) GetBrands(page int) ([]Brand, bool, error)
+```
+GetBrands returns all brands, handling pagination context: the BigCommerce
+context (e.g. stores/23412341234) where 23412341234 is the store hash
+xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials
+(see AuthContext) page: the page number to download
+
+#### func (*Client) GetCart
+
+```go
+func (bc *Client) GetCart(cartID string) (*Cart, error)
+```
+GetCart gets a cart by ID from BigCommerce and returns it
+
+#### func (*Client) GetCategories
+
+```go
+func (bc *Client) GetCategories(page int) ([]Category, bool, error)
+```
+GetCategories returns a list of categories, handling pagination page: the page
+number to download
+
+#### func (*Client) GetChannels
+
+```go
+func (bc *Client) GetChannels(page int) ([]Channel, bool, error)
+```
+
+#### func (*Client) GetMainThumbnailURL
+
+```go
+func (bc *Client) GetMainThumbnailURL(productID int64) (string, error)
+```
+GetMainThumbnailURL returns the main thumbnail URL for a product this is due to
+the fact that the Product API does not return the main thumbnail URL
+
+#### func (*Client) GetPosts
+
+```go
+func (bc *Client) GetPosts(page int) ([]Post, bool, error)
+```
+GetPosts downloads all posts from BigCommerce, handling pagination context: the
+BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store
+hash xAuthToken: the BigCommerce Store's X-Auth-Token coming from store
+credentials (see AuthContext) page: the page number to download
+
+#### func (*Client) GetProductByID
+
+```go
+func (bc *Client) GetProductByID(productID int64) (*Product, error)
+```
+GetProductByID gets a product from BigCommerce by ID productID: BigCommerce
+product ID to get
+
+#### func (*Client) GetProducts
+
+```go
+func (bc *Client) GetProducts(page int) ([]Product, bool, error)
+```
+GetProducts gets a page of products from BigCommerce page: the page number to
+download
+
+#### func (*Client) GetStoreInfo
+
+```go
+func (bc *Client) GetStoreInfo() (StoreInfo, error)
+```
+GetStoreInfo returns the store info for the current store page: the page number
+to download
+
+#### func (*Client) SetProductFields
+
+```go
+func (bc *Client) SetProductFields(fields []string)
+```
+SetProductFields sets include_fields parameter for GetProducts, empty list will
+get all fields
+
+#### func (*Client) SetProductInclude
+
+```go
+func (bc *Client) SetProductInclude(subresources []string)
+```
+SetProductFields sets include_fields parameter for GetProducts, empty list will
+get all fields
+
+#### func (*Client) ValidateCredentials
+
+```go
+func (bc *Client) ValidateCredentials(email, password string) (int64, error)
+```
 
 #### type ClientRequest
 

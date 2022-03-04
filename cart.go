@@ -176,8 +176,8 @@ func (bc *Client) CartDeleteItem(cartID string, item LineItem) (*Cart, error) {
 
 // CartUpdateCustomerID updates the customer ID for a cart
 // Arguments:
-// 		cartID: the BigCommerce cart ID
-// 		customerID: the new BigCommerce customer ID
+// cartID: the BigCommerce cart ID
+// customerID: the new BigCommerce customer ID
 func (bc *Client) CartUpdateCustomerID(cartID, customerID string) (*Cart, error) {
 	req := bc.getAPIRequest(http.MethodPut, "/v3/carts/"+cartID,
 		bytes.NewReader([]byte(fmt.Sprintf(`{"customer_id": %s}`, customerID))))
