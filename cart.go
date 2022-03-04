@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -179,7 +178,7 @@ func (bc *Client) CartDeleteItem(cartID string, item LineItem) (*Cart, error) {
 // Arguments:
 // 		cartID: the BigCommerce cart ID
 // 		customerID: the new BigCommerce customer ID
-func (bc *Client) CartUpdateCustomerID(cartID string, customerID string) (*Cart, error) {
+func (bc *Client) CartUpdateCustomerID(cartID, customerID string) (*Cart, error) {
 	req := bc.getAPIRequest(http.MethodPut, "/v3/carts/"+cartID,
 		bytes.NewReader([]byte(fmt.Sprintf(`{"customer_id": %s}`, customerID))))
 	res, err := bc.HTTPClient.Do(req)
@@ -191,11 +190,11 @@ func (bc *Client) CartUpdateCustomerID(cartID string, customerID string) (*Cart,
 		return nil, err
 	}
 	var cartResponse struct {
-		ID int64 `json:"id"`
+		ID string `json:"id"`
 	}
 	err = json.Unmarshal(b, &cartResponse)
 	if err != nil {
 		return nil, err
 	}
-	return bc.GetCart(strconv.FormatInt(cartResponse.ID, 10))
+	return bc.GetCart(cartResponse.ID)
 }
