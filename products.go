@@ -240,3 +240,44 @@ func (bc *Client) GetProductByID(productID int64) (*Product, error) {
 	}
 	return &product, nil
 }
+
+type Metafield struct {
+	ID            int64     `json:"id,omitempty"`
+	Key           string    `json:"key,omitempty"`
+	Value         string    `json:"value,omitempty"`
+	ResourceID    int64     `json:"resource_id,omitempty"`
+	ResourceType  string    `json:"resource_type,omitempty"`
+	Description   string    `json:"description,omitempty"`
+	DateCreated   time.Time `json:"date_created,omitempty"`
+	DateModified  time.Time `json:"date_modified,omitempty"`
+	Namespace     string    `json:"namespace,omitempty"`
+	PermissionSet string    `json:"permission_set,omitempty"`
+}
+
+func (bc *Client) GetProductMetafields(productID int64) (map[string]Metafield, error) {
+	url := "/v3/catalog/products/" + strconv.FormatInt(productID, 10) + "/metafields"
+	req := bc.getAPIRequest(http.MethodGet, url, nil)
+	res, err := bc.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer res.Body.Close()
+	body, err := processBody(res)
+	if err != nil {
+		return nil, err
+	}
+
+	var metafieldsResponse struct {
+		Metafields []Metafield `json:"data,omitempty"`
+	}
+	err = json.Unmarshal(body, &metafieldsResponse)
+	if err != nil {
+		return nil, err
+	}
+	ret := map[string]Metafield{}
+	for _, mf := range metafieldsResponse.Metafields {
+		ret[mf.Key] = mf
+	}
+	return ret, nil
+}
