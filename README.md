@@ -136,6 +136,17 @@ type BCUser struct {
 
 BCUser is a BigCommerce shorthand object type that's in many other responses
 
+#### type BlogClient
+
+```go
+type BlogClient interface {
+	GetAllPosts(context, xAuthToken string) ([]Post, error)
+	GetPosts(page int) ([]Post, bool, error)
+}
+```
+
+BlogClient interface handles blog-related requests
+
 #### type Brand
 
 ```go
@@ -187,6 +198,42 @@ type Cart struct {
 ```
 
 Cart is a BigCommerce cart object
+
+#### type CartClient
+
+```go
+type CartClient interface {
+	CreateCart(items []LineItem) (*Cart, error)
+	GetCart(cartID string) (*Cart, error)
+	CartAddItems(cartID string, items []LineItem) (*Cart, error)
+	CartEditItem(cartID string, item LineItem) (*Cart, error)
+	CartDeleteItem(cartID string, item LineItem) (*Cart, error)
+	CartUpdateCustomerID(cartID, customerID string) (*Cart, error)
+	ValidateCredentials(email, password string) (int64, error)
+}
+```
+
+CartClient interface handles cart and login related requests
+
+#### type CatalogClient
+
+```go
+type CatalogClient interface {
+	GetAllBrands() ([]Brand, error)
+	GetBrands(page int) ([]Brand, bool, error)
+	GetAllCategories() ([]Category, error)
+	GetCategories(page int) ([]Category, bool, error)
+	GetClientRequest(requestURLQuery url.Values) (*ClientRequest, error)
+	GetMainThumbnailURL(productID int64) (string, error)
+	SetProductFields(fields []string)
+	SetProductInclude(subresources []string)
+	GetAllProducts() ([]Product, error)
+	GetProducts(page int) ([]Product, bool, error)
+	GetProductByID(productID int64) (*Product, error)
+}
+```
+
+CatalogClient interface handles catalog-related requests
 
 #### type Category
 
@@ -382,6 +429,12 @@ func (bc *Client) GetProductByID(productID int64) (*Product, error)
 GetProductByID gets a product from BigCommerce by ID productID: BigCommerce
 product ID to get
 
+#### func (*Client) GetProductMetafields
+
+```go
+func (bc *Client) GetProductMetafields(productID int64) (map[string]Metafield, error)
+```
+
 #### func (*Client) GetProducts
 
 ```go
@@ -558,6 +611,24 @@ type LoadContext struct {
 
 LoadContext is a BigCommerce load context object
 
+#### type Metafield
+
+```go
+type Metafield struct {
+	ID            int64     `json:"id,omitempty"`
+	Key           string    `json:"key,omitempty"`
+	Value         string    `json:"value,omitempty"`
+	ResourceID    int64     `json:"resource_id,omitempty"`
+	ResourceType  string    `json:"resource_type,omitempty"`
+	Description   string    `json:"description,omitempty"`
+	DateCreated   time.Time `json:"date_created,omitempty"`
+	DateModified  time.Time `json:"date_modified,omitempty"`
+	Namespace     string    `json:"namespace,omitempty"`
+	PermissionSet string    `json:"permission_set,omitempty"`
+}
+```
+
+
 #### type Post
 
 ```go
@@ -699,6 +770,19 @@ type Product struct {
 ```
 
 Product is a BigCommerce product object
+
+#### type StoreClient
+
+```go
+type StoreClient interface {
+	GetAllChannels() ([]Channel, error)
+	GetChannels(page int) ([]Channel, bool, error)
+	GetClientRequest(requestURLQuery url.Values) (*ClientRequest, error)
+	GetStoreInfo() (StoreInfo, error)
+}
+```
+
+StoreClient interface handles generic store requests
 
 #### type StoreInfo
 
