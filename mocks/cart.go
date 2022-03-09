@@ -16,6 +16,9 @@ type CartClient struct {
 }
 
 func (cm *CartClient) CreateCart(items []bigcommerce.LineItem) (*bigcommerce.Cart, error) {
+	if cm.carts == nil {
+		cm.carts = map[string]*bigcommerce.Cart{}
+	}
 	cart := bigcommerce.Cart{
 		ID:         cm.CartID,
 		CustomerID: cm.CustomerID,
@@ -26,6 +29,10 @@ func (cm *CartClient) CreateCart(items []bigcommerce.LineItem) (*bigcommerce.Car
 }
 
 func (cm *CartClient) GetCart(cartID string) (*bigcommerce.Cart, error) {
+	if cm.carts == nil {
+		cm.carts = map[string]*bigcommerce.Cart{}
+		return nil, bigcommerce.ErrNotFound
+	}
 	if cart, ok := cm.carts[cartID]; ok {
 		return cart, nil
 	}
@@ -33,6 +40,10 @@ func (cm *CartClient) GetCart(cartID string) (*bigcommerce.Cart, error) {
 }
 
 func (cm *CartClient) CartAddItems(cartID string, items []bigcommerce.LineItem) (*bigcommerce.Cart, error) {
+	if cm.carts == nil {
+		cm.carts = map[string]*bigcommerce.Cart{}
+		return nil, bigcommerce.ErrNotFound
+	}
 	if cart, ok := cm.carts[cartID]; ok {
 		cart.LineItems.PhysicalItems = append(cart.LineItems.PhysicalItems, items...)
 		return cart, nil
@@ -41,6 +52,10 @@ func (cm *CartClient) CartAddItems(cartID string, items []bigcommerce.LineItem) 
 }
 
 func (cm *CartClient) CartEditItem(cartID string, item bigcommerce.LineItem) (*bigcommerce.Cart, error) {
+	if cm.carts == nil {
+		cm.carts = map[string]*bigcommerce.Cart{}
+		return nil, bigcommerce.ErrNotFound
+	}
 	if cart, ok := cm.carts[cartID]; ok {
 		for i, lineItem := range cart.LineItems.PhysicalItems {
 			if lineItem.ID == item.ID {
@@ -53,6 +68,10 @@ func (cm *CartClient) CartEditItem(cartID string, item bigcommerce.LineItem) (*b
 }
 
 func (cm *CartClient) CartDeleteItem(cartID string, item bigcommerce.LineItem) (*bigcommerce.Cart, error) {
+	if cm.carts == nil {
+		cm.carts = map[string]*bigcommerce.Cart{}
+		return nil, bigcommerce.ErrNotFound
+	}
 	if cart, ok := cm.carts[cartID]; ok {
 		for i, lineItem := range cart.LineItems.PhysicalItems {
 			if lineItem.ID == item.ID {
@@ -65,6 +84,10 @@ func (cm *CartClient) CartDeleteItem(cartID string, item bigcommerce.LineItem) (
 }
 
 func (cm *CartClient) CartUpdateCustomerID(cartID, customerID string) (*bigcommerce.Cart, error) {
+	if cm.carts == nil {
+		cm.carts = map[string]*bigcommerce.Cart{}
+		return nil, bigcommerce.ErrNotFound
+	}
 	if cart, ok := cm.carts[cartID]; ok {
 		cid, err := strconv.ParseInt(customerID, 10, 64)
 		if err != nil {
