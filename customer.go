@@ -3,8 +3,11 @@ package bigcommerce
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"log"
 	"net/http"
+	"strings"
 )
 
 // Customer is a struct for the BigCommerce Customer API
@@ -116,8 +119,14 @@ func (bc *Client) ValidateCredentials(email, password string) (int64, error) {
 
 // CreateAccount creates a new customer account in BigCommerce and returns the customer or error
 func (bc *Client) CreateAccount(payload *CreateAccountPayload) (*Customer, error) {
+	if payload.OriginChannelID == 0 {
+		payload.OriginChannelID = bc.ChannelID
+	}
+	if payload.ChannelIds == nil {
+		payload.ChannelIds = []int{bc.ChannelID}
+	}
 	var b []byte
-	b, _ = json.Marshal(payload)
+	b, _ = json.Marshal([]CreateAccountPayload{*payload})
 	req := bc.getAPIRequest(http.MethodPost, "/v3/customers", bytes.NewBuffer(b))
 	res, err := bc.HTTPClient.Do(req)
 	if err != nil {
@@ -126,38 +135,77 @@ func (bc *Client) CreateAccount(payload *CreateAccountPayload) (*Customer, error
 	defer res.Body.Close()
 	body, err := processBody(res)
 	if err != nil {
+		if res.StatusCode == http.StatusUnprocessableEntity {
+			var errResp ErrorResult
+			err = json.Unmarshal(body, &errResp)
+			if err != nil {
+				log.Printf("Error: %s\nResult: %s", err, string(body))
+				return nil, err
+			}
+			if len(errResp.Errors) > 0 {
+				errors := []string{}
+				for _, e := range errResp.Errors {
+					errors = append(errors, e)
+				}
+				return nil, fmt.Errorf("%s", strings.Join(errors, ", "))
+			}
+			return nil, errors.New("unknown error")
+		}
+		log.Printf("Error: %s\nResult: %s", err, string(body))
 		return nil, err
 	}
-	var customer Customer
-	err = json.Unmarshal(body, &customer)
+	var ret struct {
+		Customers []Customer `json:"data"`
+	}
+	err = json.Unmarshal(body, &ret)
 	if err != nil {
 		return nil, err
 	}
-	return &customer, nil
+	return &ret.Customers[0], nil
 }
 
 // CustomerSetFormFields sets the form fields for a customer
 func (bc *Client) CustomerSetFormFields(customerID int64, formFields []FormField) error {
-	for _, formField := range formFields {
-		formField.CustomerID = customerID
+	if customerID == 0 {
+		return errors.New("customerID cannot be 0")
+	}
+	for i := range formFields {
+		formFields[i].CustomerID = customerID
 	}
 	var b []byte
 	b, _ = json.Marshal(formFields)
+	log.Printf("Fields: %s", string(b))
 	req := bc.getAPIRequest(http.MethodPut, "/v3/customers/form-field-values", bytes.NewBuffer(b))
 	res, err := bc.HTTPClient.Do(req)
 	if err != nil {
 		return err
 	}
 	defer res.Body.Close()
-	_, err = processBody(res)
+	body, err := processBody(res)
 	if err != nil {
+		if res.StatusCode == http.StatusUnprocessableEntity {
+			var errResp ErrorResult
+			err = json.Unmarshal(body, &errResp)
+			if err != nil {
+				log.Printf("Error: %s\nResult: %s", err, string(body))
+				return err
+			}
+			if len(errResp.Errors) > 0 {
+				errors := []string{}
+				for _, e := range errResp.Errors {
+					errors = append(errors, e)
+				}
+				return fmt.Errorf("%s", strings.Join(errors, ", "))
+			}
+			return errors.New("unknown error")
+		}
 		return err
 	}
 	return nil
 }
 
 func (bc *Client) CustomerGetFormFields(customerID int64) ([]FormField, error) {
-	req := bc.getAPIRequest(http.MethodGet, fmt.Sprintf("/v3/customers/form-fields?customer_id=%d", customerID), nil)
+	req := bc.getAPIRequest(http.MethodGet, fmt.Sprintf("/v3/customers/form-field-values?customer_id=%d", customerID), nil)
 	res, err := bc.HTTPClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -167,12 +215,15 @@ func (bc *Client) CustomerGetFormFields(customerID int64) ([]FormField, error) {
 	if err != nil {
 		return nil, err
 	}
-	var formFields []FormField
-	err = json.Unmarshal(body, &formFields)
+	var ret struct {
+		Data []FormField `json:"data"`
+	}
+	err = json.Unmarshal(body, &ret)
 	if err != nil {
 		return nil, err
 	}
-	return formFields, nil
+	log.Printf("Form fields: %s", string(body))
+	return ret.Data, nil
 }
 
 func (bc *Client) GetCustomerByID(customerID int64) (*Customer, error) {
@@ -186,15 +237,17 @@ func (bc *Client) GetCustomerByID(customerID int64) (*Customer, error) {
 	if err != nil {
 		return nil, err
 	}
-	var customers []Customer
-	err = json.Unmarshal(body, &customers)
+	var ret struct {
+		Data []Customer `json:"data"`
+	}
+	err = json.Unmarshal(body, &ret)
 	if err != nil {
 		return nil, err
 	}
-	if len(customers) == 0 {
+	if len(ret.Data) == 0 {
 		return nil, ErrNotFound
 	}
-	return &customers[0], nil
+	return &ret.Data[0], nil
 }
 
 func (bc *Client) GetCustomerByEmail(email string) (*Customer, error) {
@@ -208,13 +261,15 @@ func (bc *Client) GetCustomerByEmail(email string) (*Customer, error) {
 	if err != nil {
 		return nil, err
 	}
-	var customers []Customer
-	err = json.Unmarshal(body, &customers)
+	var ret struct {
+		Data []Customer `json:"data"`
+	}
+	err = json.Unmarshal(body, &ret)
 	if err != nil {
 		return nil, err
 	}
-	if len(customers) == 0 {
+	if len(ret.Data) == 0 {
 		return nil, ErrNotFound
 	}
-	return &customers[0], nil // BigCommerce can have multiple customers with same email, we are returning the first one
+	return &ret.Data[0], nil // return the first customer
 }

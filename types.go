@@ -71,3 +71,10 @@ type Discount struct {
 	ID               string  `json:"id"`
 	DiscountedAmount float64 `json:"discounted_amount"`
 }
+
+type ErrorResult struct {
+	Status int               `json:"status"`
+	Title  string            `json:"title"`
+	Type   string            `json:"type"`
+	Errors map[string]string `json:"errors"`
+}
