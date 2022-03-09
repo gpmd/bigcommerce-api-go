@@ -3,6 +3,7 @@ package bigcommerce
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -153,4 +154,67 @@ func (bc *Client) CustomerSetFormFields(customerID int64, formFields []FormField
 		return err
 	}
 	return nil
+}
+
+func (bc *Client) CustomerGetFormFields(customerID int64) ([]FormField, error) {
+	req := bc.getAPIRequest(http.MethodGet, fmt.Sprintf("/v3/customers/form-fields?customer_id=%d", customerID), nil)
+	res, err := bc.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+	body, err := processBody(res)
+	if err != nil {
+		return nil, err
+	}
+	var formFields []FormField
+	err = json.Unmarshal(body, &formFields)
+	if err != nil {
+		return nil, err
+	}
+	return formFields, nil
+}
+
+func (bc *Client) GetCustomerByID(customerID int64) (*Customer, error) {
+	req := bc.getAPIRequest(http.MethodGet, fmt.Sprintf("/v3/customers?id:in=%d", customerID), nil)
+	res, err := bc.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+	body, err := processBody(res)
+	if err != nil {
+		return nil, err
+	}
+	var customers []Customer
+	err = json.Unmarshal(body, &customers)
+	if err != nil {
+		return nil, err
+	}
+	if len(customers) == 0 {
+		return nil, ErrNotFound
+	}
+	return &customers[0], nil
+}
+
+func (bc *Client) GetCustomerByEmail(email string) (*Customer, error) {
+	req := bc.getAPIRequest(http.MethodGet, fmt.Sprintf("/v3/customers?email:in=%s", email), nil)
+	res, err := bc.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+	body, err := processBody(res)
+	if err != nil {
+		return nil, err
+	}
+	var customers []Customer
+	err = json.Unmarshal(body, &customers)
+	if err != nil {
+		return nil, err
+	}
+	if len(customers) == 0 {
+		return nil, ErrNotFound
+	}
+	return &customers[0], nil // BigCommerce can have multiple customers with same email, we are returning the first one
 }

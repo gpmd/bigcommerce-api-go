@@ -47,4 +47,7 @@ type CustomerClient interface {
 	ValidateCredentials(email, password string) (int64, error)
 	CreateAccount(customer *CreateAccountPayload) (*Customer, error)
 	CustomerSetFormFields(customerID int64, formFields []FormField) error
+	CustomerGetFormFields(customerID int64) ([]FormField, error)
+	GetCustomerByID(customerID int64) (*Customer, error)
+	GetCustomerByEmail(email string) (*Customer, error)
 }

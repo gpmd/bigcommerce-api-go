@@ -9,6 +9,7 @@ type CustomerClient struct {
 	Email      string
 	Password   string
 	Customer   *bigcommerce.Customer
+	FormFields []bigcommerce.FormField
 }
 
 func (cm *CustomerClient) ValidateCredentials(email, password string) (int64, error) {
@@ -24,4 +25,16 @@ func (cm *CustomerClient) CreateAccount(customer *bigcommerce.CreateAccountPaylo
 
 func (cm *CustomerClient) CustomerSetFormFields(customerID int64, formFields []bigcommerce.FormField) error {
 	return nil
+}
+
+func (cm *CustomerClient) CustomerGetFormFields(customerID int64) ([]bigcommerce.FormField, error) {
+	return cm.FormFields, nil
+}
+
+func (cm *CustomerClient) GetCustomerByEmail(email string) (*bigcommerce.Customer, error) {
+	return cm.Customer, nil
+}
+
+func (cm *CustomerClient) CetCustomerByID(customerID int64) (*bigcommerce.Customer, error) {
+	return cm.Customer, nil
 }
