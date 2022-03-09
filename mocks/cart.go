@@ -11,8 +11,6 @@ type CartClient struct {
 	CartContent map[string]bigcommerce.LineItem
 	CartID      string
 	CustomerID  int64
-	Email       string
-	Password    string
 }
 
 func (cm *CartClient) CreateCart(items []bigcommerce.LineItem) (*bigcommerce.Cart, error) {
@@ -97,11 +95,4 @@ func (cm *CartClient) CartUpdateCustomerID(cartID, customerID string) (*bigcomme
 		return cart, nil
 	}
 	return nil, bigcommerce.ErrNotFound
-}
-
-func (cm *CartClient) ValidateCredentials(email, password string) (int64, error) {
-	if email == cm.Email && password == cm.Password {
-		return 1, nil
-	}
-	return 0, bigcommerce.ErrNotFound
 }
