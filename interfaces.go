@@ -41,5 +41,9 @@ type CartClient interface {
 	CartEditItem(cartID string, item LineItem) (*Cart, error)
 	CartDeleteItem(cartID string, item LineItem) (*Cart, error)
 	CartUpdateCustomerID(cartID, customerID string) (*Cart, error)
+}
+
+type CustomerClient interface {
 	ValidateCredentials(email, password string) (int64, error)
+	CreateAccount(customer *CreateAccountPayload) (*Customer, error)
 }
