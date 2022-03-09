@@ -27,9 +27,7 @@ type Post struct {
 }
 
 // GetAllPosts downloads all posts from BigCommerce, handling pagination
-// context: the BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store hash
-// xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials (see AuthContext)
-func (bc *Client) GetAllPosts(context, xAuthToken string) ([]Post, error) {
+func (bc *Client) GetAllPosts() ([]Post, error) {
 	cs := []Post{}
 	var csp []Post
 	page := 1
@@ -53,8 +51,6 @@ func (bc *Client) GetAllPosts(context, xAuthToken string) ([]Post, error) {
 }
 
 // GetPosts downloads all posts from BigCommerce, handling pagination
-// context: the BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store hash
-// xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials (see AuthContext)
 // page: the page number to download
 func (bc *Client) GetPosts(page int) ([]Post, bool, error) {
 	url := "/v2/blog/posts?limit=250&page=" + strconv.Itoa(page)

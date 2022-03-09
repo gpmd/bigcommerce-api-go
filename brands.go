@@ -54,8 +54,6 @@ func (bc *Client) GetAllBrands() ([]Brand, error) {
 }
 
 // GetBrands returns all brands, handling pagination
-// context: the BigCommerce context (e.g. stores/23412341234) where 23412341234 is the store hash
-// xAuthToken: the BigCommerce Store's X-Auth-Token coming from store credentials (see AuthContext)
 // page: the page number to download
 func (bc *Client) GetBrands(page int) ([]Brand, bool, error) {
 	url := "/v3/catalog/brands?page=" + strconv.Itoa(page)
