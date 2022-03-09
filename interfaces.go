@@ -46,4 +46,5 @@ type CartClient interface {
 type CustomerClient interface {
 	ValidateCredentials(email, password string) (int64, error)
 	CreateAccount(customer *CreateAccountPayload) (*Customer, error)
+	CustomerSetFormFields(customerID int64, formFields []FormField) error
 }
