@@ -35,6 +35,6 @@ func (cm *CustomerClient) GetCustomerByEmail(email string) (*bigcommerce.Custome
 	return cm.Customer, nil
 }
 
-func (cm *CustomerClient) CetCustomerByID(customerID int64) (*bigcommerce.Customer, error) {
+func (cm *CustomerClient) GetCustomerByID(customerID int64) (*bigcommerce.Customer, error) {
 	return cm.Customer, nil
 }
