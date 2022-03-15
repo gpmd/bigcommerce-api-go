@@ -194,18 +194,10 @@ func (bc *Client) GetProducts(page int) ([]Product, bool, error) {
 	var pp struct {
 		Status int       `json:"status"`
 		Title  string    `json:"title"`
-		Data   []Product `json:"data,omitempty"`
+		Data   []Product `json:"data"`
 		Meta   struct {
-			Pagination struct {
-				Total       int64       `json:"total,omitempty"`
-				Count       int64       `json:"count,omitempty"`
-				PerPage     int64       `json:"per_page,omitempty"`
-				CurrentPage int64       `json:"current_page,omitempty"`
-				TotalPages  int64       `json:"total_pages,omitempty"`
-				Links       interface{} `json:"links,omitempty"`
-				TooMany     bool        `json:"too_many,omitempty"`
-			} `json:"pagination,omitempty"`
-		} `json:"meta,omitempty"`
+			Pagination Pagination `json:"pagination"`
+		} `json:"meta"`
 	}
 	err = json.Unmarshal(body, &pp)
 	if err != nil {

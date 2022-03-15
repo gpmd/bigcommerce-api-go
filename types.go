@@ -78,3 +78,16 @@ type ErrorResult struct {
 	Type   string            `json:"type"`
 	Errors map[string]string `json:"errors"`
 }
+
+type Pagination struct {
+	Count       int `json:"count"`
+	CurrentPage int `json:"current_page"`
+	Links       struct {
+		Current  string `json:"current"`
+		Next     string `json:"next"`
+		Previous string `json:"previous"`
+	} `json:"links"`
+	PerPage    int `json:"per_page"`
+	Total      int `json:"total"`
+	TotalPages int `json:"total_pages"`
+}

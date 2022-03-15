@@ -73,15 +73,7 @@ func (bc *Client) GetBrands(page int) ([]Brand, bool, error) {
 	var pp struct {
 		Data []Brand `json:"data"`
 		Meta struct {
-			Pagination struct {
-				Total       int64       `json:"total"`
-				Count       int64       `json:"count"`
-				PerPage     int64       `json:"per_page"`
-				CurrentPage int64       `json:"current_page"`
-				TotalPages  int64       `json:"total_pages"`
-				Links       interface{} `json:"links"`
-				TooMany     bool        `json:"too_many"`
-			} `json:"pagination"`
+			Pagination Pagination `json:"pagination"`
 		} `json:"meta"`
 	}
 	err = json.Unmarshal(body, &pp)
