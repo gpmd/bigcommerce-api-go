@@ -23,7 +23,7 @@ type Post struct {
 	MetaDescription      string      `json:"meta_description"`
 	MetaKeywords         string      `json:"meta_keywords"`
 	Author               string      `json:"author"`
-	ThumbnailPath        string      `json:"thumbnailpath"`
+	ThumbnailPath        string      `json:"thumbnail_path"`
 }
 
 // GetAllPosts downloads all posts from BigCommerce, handling pagination
