@@ -34,6 +34,25 @@ var ErrNotFound = errors.New("404 not found")
 
 ## Types
 
+# bigcommerce
+--
+    import "."
+
+
+## Usage
+
+```go
+var ErrNoContent = errors.New("no content 204 from BigCommerce API")
+```
+
+```go
+var ErrNoMainThumbnail = errors.New("no main thumbnail")
+```
+
+```go
+var ErrNotFound = errors.New("404 not found")
+```
+
 #### type Address
 
 ```go
@@ -373,6 +392,14 @@ func (bc *Client) CreateCart(items []LineItem) (*Cart, error)
 ```
 CreateCart creates a new cart in BigCommerce and returns it
 
+#### func (*Client) CreateWebhook
+
+```go
+func (bc *Client) CreateWebhook(scope, destination string, headers map[string]string) (int64, error)
+```
+CreateWebhook creates a new webhook or activates it if it already exists but
+inactive
+
 #### func (*Client) CustomerGetFormFields
 
 ```go
@@ -527,14 +554,17 @@ product ID to get
 ```go
 func (bc *Client) GetProductMetafields(productID int64) (map[string]Metafield, error)
 ```
+GetProductMetafields gets metafields values for a product productID: BigCommerce
+product ID to get metafields for
 
 #### func (*Client) GetProducts
 
 ```go
-func (bc *Client) GetProducts(page int) ([]Product, bool, error)
+func (bc *Client) GetProducts(fields, include []string, page int) ([]Product, bool, error)
 ```
-GetProducts gets a page of products from BigCommerce page: the page number to
-download
+GetProducts gets a page of products from BigCommerce fields is a list of fields
+to include in the response include is a list of subresources to include in the
+response page: the page number to download
 
 #### func (*Client) GetStoreInfo
 
@@ -543,6 +573,12 @@ func (bc *Client) GetStoreInfo() (StoreInfo, error)
 ```
 GetStoreInfo returns the store info for the current store page: the page number
 to download
+
+#### func (*Client) GetWebhooks
+
+```go
+func (bc *Client) GetWebhooks() ([]Webhook, error)
+```
 
 #### func (*Client) SetProductFields
 
@@ -783,6 +819,7 @@ type Metafield struct {
 }
 ```
 
+Metafield is a struct representing a BigCommerce product metafield
 
 #### type Order
 
@@ -994,6 +1031,24 @@ type OrderShippingAddress struct {
 ```
 
 
+#### type Pagination
+
+```go
+type Pagination struct {
+	Count       int `json:"count"`
+	CurrentPage int `json:"current_page"`
+	Links       struct {
+		Current  string `json:"current"`
+		Next     string `json:"next"`
+		Previous string `json:"previous"`
+	} `json:"links"`
+	PerPage    int `json:"per_page"`
+	Total      int `json:"total"`
+	TotalPages int `json:"total_pages"`
+}
+```
+
+
 #### type Post
 
 ```go
@@ -1011,7 +1066,7 @@ type Post struct {
 	MetaDescription      string      `json:"meta_description"`
 	MetaKeywords         string      `json:"meta_keywords"`
 	Author               string      `json:"author"`
-	ThumbnailPath        string      `json:"thumbnailpath"`
+	ThumbnailPath        string      `json:"thumbnail_path"`
 }
 ```
 
@@ -1265,6 +1320,23 @@ type UserPart struct {
 
 UserPart is a BigCommerce user shorthand object type that's in many other
 responses
+
+#### type Webhook
+
+```go
+type Webhook struct {
+	ID          int64             `json:"id"`
+	ClientID    string            `json:"client_id"`
+	StoreHash   string            `json:"store_hash"`
+	CreatedAt   int64             `json:"created_at"`
+	UpdatedAt   int64             `json:"updated_at"`
+	Scope       string            `json:"scope"`
+	Destination string            `json:"destination"`
+	IsActive    bool              `json:"is_active"`
+	Headers     map[string]string `json:"headers"`
+}
+```
+
 
 #### type WebhookPayload
 

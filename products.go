@@ -131,6 +131,20 @@ type Product struct {
 	Modifiers        []interface{} `json:"modifiers,omitempty"`
 }
 
+// Metafield is a struct representing a BigCommerce product metafield
+type Metafield struct {
+	ID            int64     `json:"id,omitempty"`
+	Key           string    `json:"key,omitempty"`
+	Value         string    `json:"value,omitempty"`
+	ResourceID    int64     `json:"resource_id,omitempty"`
+	ResourceType  string    `json:"resource_type,omitempty"`
+	Description   string    `json:"description,omitempty"`
+	DateCreated   time.Time `json:"date_created,omitempty"`
+	DateModified  time.Time `json:"date_modified,omitempty"`
+	Namespace     string    `json:"namespace,omitempty"`
+	PermissionSet string    `json:"permission_set,omitempty"`
+}
+
 // SetProductFields sets include_fields parameter for GetProducts, empty list will get all fields
 func (bc *Client) SetProductFields(fields []string) {
 	productFields = fields
@@ -143,6 +157,8 @@ func (bc *Client) SetProductInclude(subresources []string) {
 
 // GetAllProducts gets all products from BigCommerce
 func (bc *Client) GetAllProducts() ([]Product, error) {
+	fields := productFields
+	include := productInclude
 	ps := []Product{}
 	var psp []Product
 	page := 1
@@ -150,7 +166,8 @@ func (bc *Client) GetAllProducts() ([]Product, error) {
 	var err error
 	retries := 0
 	for more {
-		psp, more, err = bc.GetProducts(page)
+		psp, more, err = bc.GetProducts(fields, include, page)
+		log.Printf("page %d entries %d", page, len(psp))
 		if err != nil {
 			retries++
 			if retries > bc.MaxRetries {
@@ -166,16 +183,19 @@ func (bc *Client) GetAllProducts() ([]Product, error) {
 }
 
 // GetProducts gets a page of products from BigCommerce
+// fields is a list of fields to include in the response
+// include is a list of subresources to include in the response
 // page: the page number to download
-func (bc *Client) GetProducts(page int) ([]Product, bool, error) {
+func (bc *Client) GetProducts(fields, include []string, page int) ([]Product, bool, error) {
 	fpart := ""
-	if len(productFields) != 0 {
-		fpart = "&include_fields=" + strings.Join(productFields, ",")
+	if len(fields) != 0 {
+		fpart = "&include_fields=" + strings.Join(fields, ",")
 	}
-	if len(productInclude) != 0 {
-		fpart = "&include=" + strings.Join(productInclude, ",")
+	if len(include) != 0 {
+		fpart = "&include=" + strings.Join(include, ",")
 	}
 	url := "/v3/catalog/products?page=" + strconv.Itoa(page) + fpart
+	log.Printf("GET %s", url)
 
 	req := bc.getAPIRequest(http.MethodGet, url, nil)
 	res, err := bc.HTTPClient.Do(req)
@@ -203,6 +223,8 @@ func (bc *Client) GetProducts(page int) ([]Product, bool, error) {
 	if err != nil {
 		return nil, false, err
 	}
+	log.Printf("%d products (%+v)", len(pp.Data), pp.Meta.Pagination)
+
 	if pp.Status != 0 {
 		return nil, false, errors.New(pp.Title)
 	}
@@ -233,19 +255,8 @@ func (bc *Client) GetProductByID(productID int64) (*Product, error) {
 	return &product, nil
 }
 
-type Metafield struct {
-	ID            int64     `json:"id,omitempty"`
-	Key           string    `json:"key,omitempty"`
-	Value         string    `json:"value,omitempty"`
-	ResourceID    int64     `json:"resource_id,omitempty"`
-	ResourceType  string    `json:"resource_type,omitempty"`
-	Description   string    `json:"description,omitempty"`
-	DateCreated   time.Time `json:"date_created,omitempty"`
-	DateModified  time.Time `json:"date_modified,omitempty"`
-	Namespace     string    `json:"namespace,omitempty"`
-	PermissionSet string    `json:"permission_set,omitempty"`
-}
-
+// GetProductMetafields gets metafields values for a product
+// productID: BigCommerce product ID to get metafields for
 func (bc *Client) GetProductMetafields(productID int64) (map[string]Metafield, error) {
 	url := "/v3/catalog/products/" + strconv.FormatInt(productID, 10) + "/metafields"
 	req := bc.getAPIRequest(http.MethodGet, url, nil)
