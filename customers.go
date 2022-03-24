@@ -59,21 +59,6 @@ type Authentication struct {
 	Password           string `json:"new_password"`
 }
 
-// Address is for CreateAccountPayload's addresses field
-type Address struct {
-	Address1        string `json:"address1"`
-	Address2        string `json:"address2"`
-	AddressType     string `json:"address_type"`
-	City            string `json:"city"`
-	Company         string `json:"company"`
-	CountryCode     string `json:"country_code"`
-	FirstName       string `json:"first_name"`
-	LastName        string `json:"last_name"`
-	Phone           string `json:"phone"`
-	PostalCode      string `json:"postal_code"`
-	StateOrProvince string `json:"state_or_province"`
-}
-
 // FormField is a struct for the BigCommerce Customer API Form Fiel values
 type FormField struct {
 	CustomerID int64  `json:"customer_id"`

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -71,6 +72,7 @@ func processBody(res *http.Response) ([]byte, error) {
 	}
 	res.Body.Close()
 	if res.StatusCode > 299 {
+		log.Printf("%s %s %s", res.Request.Method, res.Request.URL, string(body))
 		return body, errors.New(res.Status)
 	}
 	return body, nil

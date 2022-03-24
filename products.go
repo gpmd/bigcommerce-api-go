@@ -17,6 +17,9 @@ var productFields = []string{"name", "sku", "custom_url", "is_visible", "price"}
 // include (subresources, like variants images custom_fields bulk_pricing_rules primary_image modifiers options videos)
 var productInclude []string
 
+// extra arguments for product interface
+var productArgs map[string]string
+
 // Product is a BigCommerce product object
 type Product struct {
 	ID                      int64         `json:"id,omitempty"`
@@ -155,10 +158,16 @@ func (bc *Client) SetProductInclude(subresources []string) {
 	productInclude = subresources
 }
 
+// SetProductFields sets include_fields parameter for GetProducts, empty list will get all fields
+func (bc *Client) SetProductArgs(args map[string]string) {
+	productArgs = args
+}
+
 // GetAllProducts gets all products from BigCommerce
 func (bc *Client) GetAllProducts() ([]Product, error) {
 	fields := productFields
 	include := productInclude
+	args := productArgs
 	ps := []Product{}
 	var psp []Product
 	page := 1
@@ -166,7 +175,7 @@ func (bc *Client) GetAllProducts() ([]Product, error) {
 	var err error
 	retries := 0
 	for more {
-		psp, more, err = bc.GetProducts(fields, include, page)
+		psp, more, err = bc.GetProducts(fields, include, args, page)
 		log.Printf("page %d entries %d", page, len(psp))
 		if err != nil {
 			retries++
@@ -185,14 +194,18 @@ func (bc *Client) GetAllProducts() ([]Product, error) {
 // GetProducts gets a page of products from BigCommerce
 // fields is a list of fields to include in the response
 // include is a list of subresources to include in the response
+// extraArgs is a key-value map of additional arguments to pass to the API
 // page: the page number to download
-func (bc *Client) GetProducts(fields, include []string, page int) ([]Product, bool, error) {
+func (bc *Client) GetProducts(fields, include []string, extraArgs map[string]string, page int) ([]Product, bool, error) {
 	fpart := ""
 	if len(fields) != 0 {
 		fpart = "&include_fields=" + strings.Join(fields, ",")
 	}
 	if len(include) != 0 {
 		fpart = "&include=" + strings.Join(include, ",")
+	}
+	for k, v := range extraArgs {
+		fpart += "&" + k + "=" + v
 	}
 	url := "/v3/catalog/products?page=" + strconv.Itoa(page) + fpart
 	log.Printf("GET %s", url)

@@ -51,3 +51,10 @@ type CustomerClient interface {
 	GetCustomerByID(customerID int64) (*Customer, error)
 	GetCustomerByEmail(email string) (*Customer, error)
 }
+
+type AddressClient interface {
+	CreateAddress(customerID int64, address *Address) (*Address, error)
+	UpdateAddress(customerID int64, address *Address) (*Address, error)
+	DeleteAddress(customerID int64, addressID int64) error
+	GetAddresses(customerID int64) ([]Address, error)
+}
