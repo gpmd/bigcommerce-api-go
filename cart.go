@@ -4,17 +4,19 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 )
 
 // Cart is a BigCommerce cart object
 type Cart struct {
-	ID         string `json:"id"`
-	CustomerID int64  `json:"customer_id,omitempty"`
-	ChannelID  int64  `json:"channel_id,omitempty"`
-	Email      string `json:"email,omitempty"`
-	Currency   struct {
+	ID          string `json:"id"`
+	CheckoutURL string `json:"checkout_url,omitempty"`
+	CustomerID  int64  `json:"customer_id,omitempty"`
+	ChannelID   int64  `json:"channel_id,omitempty"`
+	Email       string `json:"email,omitempty"`
+	Currency    struct {
 		Code string `json:"code,omitempty"`
 	} `json:"currency,omitempty"`
 	TaxIncluded    bool       `json:"tax_included,omitempty"`
@@ -56,6 +58,12 @@ type LineItem struct {
 	ExtendedSalePrice float64    `json:"extended_sale_price,omitempty"`
 	IsRequireShipping bool       `json:"is_require_shipping,omitempty"`
 	IsMutable         bool       `json:"is_mutable,omitempty"`
+}
+
+type CartURLs struct {
+	CartURL             string `json:"cart_url,omitempty"`
+	CheckoutURL         string `json:"checkout_url,omitempty"`
+	EmbeddedCheckoutURL string `json:"embedded_checkout_url,omitempty"`
 }
 
 // CreateCart creates a new cart in BigCommerce and returns it
@@ -197,4 +205,26 @@ func (bc *Client) CartUpdateCustomerID(cartID, customerID string) (*Cart, error)
 		return nil, err
 	}
 	return bc.GetCart(cartResponse.ID)
+}
+
+// GetCheckoutURL gets the checkout and cart redirect URL for a cart
+func (bc *Client) GetCheckoutURLs(cartID string) (*CartURLs, error) {
+	log.Printf("URL: /v3/carts/" + cartID + "/redirect_urls")
+	req := bc.getAPIRequest(http.MethodPost, "/v3/carts/"+cartID+"/redirect_urls", nil)
+	res, err := bc.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	b, err := processBody(res)
+	if err != nil {
+		return nil, err
+	}
+	var urlResponse struct {
+		Data CartURLs `json:"data,omitempty"`
+	}
+	err = json.Unmarshal(b, &urlResponse)
+	if err != nil {
+		return nil, err
+	}
+	return &urlResponse.Data, nil
 }
