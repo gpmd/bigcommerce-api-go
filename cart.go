@@ -204,7 +204,7 @@ func (bc *Client) CartUpdateCustomerID(cartID, customerID string) (*Cart, error)
 	if err != nil {
 		return nil, err
 	}
-	return bc.GetCart(cartResponse.Data.ID)
+	return &cartResponse.Data, nil
 }
 
 // GetCheckoutURL gets the checkout and cart redirect URL for a cart
