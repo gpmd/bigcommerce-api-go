@@ -198,13 +198,13 @@ func (bc *Client) CartUpdateCustomerID(cartID, customerID string) (*Cart, error)
 		return nil, err
 	}
 	var cartResponse struct {
-		ID string `json:"id"`
+		Data Cart `json:"data,omitempty"`
 	}
 	err = json.Unmarshal(b, &cartResponse)
 	if err != nil {
 		return nil, err
 	}
-	return bc.GetCart(cartResponse.ID)
+	return bc.GetCart(cartResponse.Data.ID)
 }
 
 // GetCheckoutURL gets the checkout and cart redirect URL for a cart
