@@ -247,7 +247,7 @@ func (bc *Client) GetProducts(fields, include []string, extraArgs map[string]str
 // GetProductByID gets a product from BigCommerce by ID
 // productID: BigCommerce product ID to get
 func (bc *Client) GetProductByID(productID int64) (*Product, error) {
-	url := "/v3/catalog/products/" + strconv.FormatInt(productID, 10)
+	url := "/v3/catalog/products/" + strconv.FormatInt(productID, 10) + "?include=variants,images,custom_fields,bulk_pricing_rules,primary_image,modifiers,options,videos"
 	req := bc.getAPIRequest(http.MethodGet, url, nil)
 	res, err := bc.HTTPClient.Do(req)
 	if err != nil {

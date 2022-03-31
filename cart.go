@@ -31,9 +31,14 @@ type Cart struct {
 		GiftCertificates []LineItem `json:"gift_certificates,omitempty"`
 		CustomItems      []LineItem `json:"custom_items,omitempty"`
 	} `json:"line_items"`
-	CreatedTime time.Time `json:"created_time,omitempty"`
-	UpdatedTime time.Time `json:"updated_time,omitempty"`
-	Locale      string    `json:"locale,omitempty"`
+	CreatedTime  time.Time `json:"created_time,omitempty"`
+	UpdatedTime  time.Time `json:"updated_time,omitempty"`
+	RedirectUrls struct {
+		CartURL             string `json:"cart_url"`
+		CheckoutURL         string `json:"checkout_url"`
+		EmbeddedCheckoutURL string `json:"embedded_checkout_url"`
+	} `json:"redirect_urls,omitempty"`
+	Locale string `json:"locale,omitempty"`
 }
 
 // LineItem is a BigCommerce line item object for cart
@@ -187,7 +192,7 @@ func (bc *Client) CartDeleteItem(cartID string, item LineItem) (*Cart, error) {
 // cartID: the BigCommerce cart ID
 // customerID: the new BigCommerce customer ID
 func (bc *Client) CartUpdateCustomerID(cartID, customerID string) (*Cart, error) {
-	req := bc.getAPIRequest(http.MethodPut, "/v3/carts/"+cartID,
+	req := bc.getAPIRequest(http.MethodPut, "/v3/carts/"+cartID+"?include=redirect_urls",
 		bytes.NewReader([]byte(fmt.Sprintf(`{"customer_id": %s}`, customerID))))
 	res, err := bc.HTTPClient.Do(req)
 	if err != nil {
