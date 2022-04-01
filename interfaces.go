@@ -41,6 +41,7 @@ type CartClient interface {
 	CartEditItem(cartID string, item LineItem) (*Cart, error)
 	CartDeleteItem(cartID string, item LineItem) (*Cart, error)
 	CartUpdateCustomerID(cartID, customerID string) (*Cart, error)
+	DeleteCart(cartID string) error
 }
 
 type CustomerClient interface {

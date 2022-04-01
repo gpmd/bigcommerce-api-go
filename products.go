@@ -234,12 +234,14 @@ func (bc *Client) GetProductByID(productID int64) (*Product, error) {
 		return nil, err
 	}
 
-	var product Product
-	err = json.Unmarshal(body, &product)
+	var productResponse struct {
+		Data Product `json:"data"`
+	}
+	err = json.Unmarshal(body, &productResponse)
 	if err != nil {
 		return nil, err
 	}
-	return &product, nil
+	return &productResponse.Data, nil
 }
 
 // GetProductMetafields gets metafields values for a product

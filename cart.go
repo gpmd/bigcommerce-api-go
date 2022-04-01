@@ -210,3 +210,16 @@ func (bc *Client) CartUpdateCustomerID(cartID, customerID string) (*Cart, error)
 	}
 	return &cartResponse.Data, nil
 }
+
+// DeleteCart deletes a cart by ID from BigCommerce
+func (bc *Client) DeleteCart(cartID string) error {
+	req := bc.getAPIRequest(http.MethodDelete, "/v3/carts/"+cartID, nil)
+	res, err := bc.HTTPClient.Do(req)
+	if err != nil {
+		return err
+	}
+	if res.StatusCode != http.StatusNoContent {
+		return fmt.Errorf("unexpected status code: %d", res.StatusCode)
+	}
+	return nil
+}

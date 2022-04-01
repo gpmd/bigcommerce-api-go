@@ -34,6 +34,7 @@ var ErrNotFound = errors.New("404 not found")
 
 ## Types
 
+
 #### type Address
 
 ```go
@@ -261,6 +262,7 @@ type CartClient interface {
 	CartEditItem(cartID string, item LineItem) (*Cart, error)
 	CartDeleteItem(cartID string, item LineItem) (*Cart, error)
 	CartUpdateCustomerID(cartID, customerID string) (*Cart, error)
+	DeleteCart(cartID string) error
 }
 ```
 
@@ -440,6 +442,13 @@ CustomerSetFormFields sets the form fields for a customer
 func (bc *Client) DeleteAddress(customerID, addressID int64) error
 ```
 DeleteAddress deletes an existing address, address ID is required
+
+#### func (*Client) DeleteCart
+
+```go
+func (bc *Client) DeleteCart(cartID string) error
+```
+DeleteCart deletes a cart by ID from BigCommerce
 
 #### func (*Client) GetActiveThemeConfig
 
