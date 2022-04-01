@@ -22,7 +22,7 @@ type CatalogClient interface {
 	GetMainThumbnailURL(productID int64) (string, error)
 	SetProductFields(fields []string)
 	SetProductInclude(subresources []string)
-	GetAllProducts() ([]Product, error)
+	GetAllProducts(map[string]string) ([]Product, error)
 	GetProducts(page int) ([]Product, bool, error)
 	GetProductByID(productID int64) (*Product, error)
 }
