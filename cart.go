@@ -18,12 +18,12 @@ type Cart struct {
 	Currency    struct {
 		Code string `json:"code,omitempty"`
 	} `json:"currency,omitempty"`
-	TaxIncluded    bool       `json:"tax_included,omitempty"`
-	BaseAmount     float64    `json:"base_amount,omitempty"`
-	DiscountAmount float64    `json:"discount_amount,omitempty"`
-	CartAmount     float64    `json:"cart_amount,omitempty"`
-	Discounts      []Discount `json:"discounts,omitempty"`
-	Coupons        []Coupon   `json:"coupons,omitempty"`
+	TaxIncluded    bool         `json:"tax_included,omitempty"`
+	BaseAmount     float64      `json:"base_amount,omitempty"`
+	DiscountAmount float64      `json:"discount_amount,omitempty"`
+	CartAmount     float64      `json:"cart_amount,omitempty"`
+	Discounts      []Discount   `json:"discounts,omitempty"`
+	Coupons        []CartCoupon `json:"coupons,omitempty"`
 	LineItems      struct {
 		PhysicalItems    []LineItem `json:"physical_items,omitempty"`
 		DigitalItems     []LineItem `json:"digital_items,omitempty"`

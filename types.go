@@ -60,7 +60,7 @@ type InventoryEntry struct {
 	VariantID int64   `json:"variant_id"`
 }
 
-type Coupon struct {
+type CartCoupon struct {
 	Code             string  `json:"code"`
 	ID               string  `json:"id"`
 	CouponType       string  `json:"coupon_type"`
