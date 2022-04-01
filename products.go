@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -148,26 +147,9 @@ type Metafield struct {
 	PermissionSet string    `json:"permission_set,omitempty"`
 }
 
-// SetProductFields sets include_fields parameter for GetProducts, empty list will get all fields
-func (bc *Client) SetProductFields(fields []string) {
-	productFields = fields
-}
-
-// SetProductFields sets include_fields parameter for GetProducts, empty list will get all fields
-func (bc *Client) SetProductInclude(subresources []string) {
-	productInclude = subresources
-}
-
-// SetProductFields sets include_fields parameter for GetProducts, empty list will get all fields
-func (bc *Client) SetProductArgs(args map[string]string) {
-	productArgs = args
-}
-
 // GetAllProducts gets all products from BigCommerce
-func (bc *Client) GetAllProducts() ([]Product, error) {
-	fields := productFields
-	include := productInclude
-	args := productArgs
+// args is a key-value map of additional arguments to pass to the API
+func (bc *Client) GetAllProducts(args map[string]string) ([]Product, error) {
 	ps := []Product{}
 	var psp []Product
 	page := 1
@@ -175,8 +157,8 @@ func (bc *Client) GetAllProducts() ([]Product, error) {
 	var err error
 	retries := 0
 	for more {
-		psp, more, err = bc.GetProducts(fields, include, args, page)
-		log.Printf("page %d entries %d", page, len(psp))
+		psp, more, err = bc.GetProducts(args, page)
+		// log.Printf("page %d entries %d", page, len(psp))
 		if err != nil {
 			retries++
 			if retries > bc.MaxRetries {
@@ -192,23 +174,15 @@ func (bc *Client) GetAllProducts() ([]Product, error) {
 }
 
 // GetProducts gets a page of products from BigCommerce
-// fields is a list of fields to include in the response
-// include is a list of subresources to include in the response
-// extraArgs is a key-value map of additional arguments to pass to the API
+// args is a key-value map of additional arguments to pass to the API
 // page: the page number to download
-func (bc *Client) GetProducts(fields, include []string, extraArgs map[string]string, page int) ([]Product, bool, error) {
+func (bc *Client) GetProducts(args map[string]string, page int) ([]Product, bool, error) {
 	fpart := ""
-	if len(fields) != 0 {
-		fpart = "&include_fields=" + strings.Join(fields, ",")
-	}
-	if len(include) != 0 {
-		fpart = "&include=" + strings.Join(include, ",")
-	}
-	for k, v := range extraArgs {
+	for k, v := range args {
 		fpart += "&" + k + "=" + v
 	}
 	url := "/v3/catalog/products?page=" + strconv.Itoa(page) + fpart
-	log.Printf("GET %s", url)
+	// log.Printf("GET %s", url)
 
 	req := bc.getAPIRequest(http.MethodGet, url, nil)
 	res, err := bc.HTTPClient.Do(req)
@@ -236,7 +210,7 @@ func (bc *Client) GetProducts(fields, include []string, extraArgs map[string]str
 	if err != nil {
 		return nil, false, err
 	}
-	log.Printf("%d products (%+v)", len(pp.Data), pp.Meta.Pagination)
+	//	log.Printf("%d products (%+v)", len(pp.Data), pp.Meta.Pagination)
 
 	if pp.Status != 0 {
 		return nil, false, errors.New(pp.Title)

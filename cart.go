@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 )
@@ -78,7 +77,7 @@ func (bc *Client) CreateCart(items []LineItem) (*Cart, error) {
 		"channel_id": bc.ChannelID,
 		"line_items": items,
 	})
-	req := bc.getAPIRequest(http.MethodPost, "/v3/carts", bytes.NewReader(body))
+	req := bc.getAPIRequest(http.MethodPost, "/v3/carts?include=redirect_urls", bytes.NewReader(body))
 	res, err := bc.HTTPClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -101,7 +100,7 @@ func (bc *Client) CreateCart(items []LineItem) (*Cart, error) {
 
 // GetCart gets a cart by ID from BigCommerce and returns it
 func (bc *Client) GetCart(cartID string) (*Cart, error) {
-	req := bc.getAPIRequest(http.MethodGet, "/v3/carts/"+cartID, nil)
+	req := bc.getAPIRequest(http.MethodGet, "/v3/carts/"+cartID+"?include=redirect_urls", nil)
 	res, err := bc.HTTPClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -128,7 +127,7 @@ func (bc *Client) CartAddItems(cartID string, items []LineItem) (*Cart, error) {
 	body, _ = json.Marshal(map[string]interface{}{
 		"line_items": items,
 	})
-	req := bc.getAPIRequest(http.MethodPost, "/v3/carts/"+cartID+"/items", bytes.NewReader(body))
+	req := bc.getAPIRequest(http.MethodPost, "/v3/carts/"+cartID+"/items?include=redirect_urls", bytes.NewReader(body))
 	res, err := bc.HTTPClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -158,7 +157,7 @@ func (bc *Client) CartEditItem(cartID string, item LineItem) (*Cart, error) {
 	body, _ = json.Marshal(map[string]interface{}{
 		"line_item": item,
 	})
-	req := bc.getAPIRequest(http.MethodPut, "/v3/carts/"+cartID+"/items/"+item.ID, bytes.NewReader(body))
+	req := bc.getAPIRequest(http.MethodPut, "/v3/carts/"+cartID+"/items/"+item.ID+"?include=redirect_urls", bytes.NewReader(body))
 	res, err := bc.HTTPClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -175,7 +174,7 @@ func (bc *Client) CartEditItem(cartID string, item LineItem) (*Cart, error) {
 // 		cartID: the cart ID
 // 		item: the line item, must have an existing line item ID
 func (bc *Client) CartDeleteItem(cartID string, item LineItem) (*Cart, error) {
-	req := bc.getAPIRequest(http.MethodDelete, "/v3/carts/"+cartID+"/items/"+item.ID, nil)
+	req := bc.getAPIRequest(http.MethodDelete, "/v3/carts/"+cartID+"/items/"+item.ID+"?include=redirect_urls", nil)
 	res, err := bc.HTTPClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -210,26 +209,4 @@ func (bc *Client) CartUpdateCustomerID(cartID, customerID string) (*Cart, error)
 		return nil, err
 	}
 	return &cartResponse.Data, nil
-}
-
-// GetCheckoutURL gets the checkout and cart redirect URL for a cart
-func (bc *Client) GetCheckoutURLs(cartID string) (*CartURLs, error) {
-	log.Printf("URL: /v3/carts/" + cartID + "/redirect_urls")
-	req := bc.getAPIRequest(http.MethodPost, "/v3/carts/"+cartID+"/redirect_urls", nil)
-	res, err := bc.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	b, err := processBody(res)
-	if err != nil {
-		return nil, err
-	}
-	var urlResponse struct {
-		Data CartURLs `json:"data,omitempty"`
-	}
-	err = json.Unmarshal(b, &urlResponse)
-	if err != nil {
-		return nil, err
-	}
-	return &urlResponse.Data, nil
 }

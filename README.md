@@ -238,9 +238,14 @@ type Cart struct {
 		GiftCertificates []LineItem `json:"gift_certificates,omitempty"`
 		CustomItems      []LineItem `json:"custom_items,omitempty"`
 	} `json:"line_items"`
-	CreatedTime time.Time `json:"created_time,omitempty"`
-	UpdatedTime time.Time `json:"updated_time,omitempty"`
-	Locale      string    `json:"locale,omitempty"`
+	CreatedTime  time.Time `json:"created_time,omitempty"`
+	UpdatedTime  time.Time `json:"updated_time,omitempty"`
+	RedirectUrls struct {
+		CartURL             string `json:"cart_url"`
+		CheckoutURL         string `json:"checkout_url"`
+		EmbeddedCheckoutURL string `json:"embedded_checkout_url"`
+	} `json:"redirect_urls,omitempty"`
+	Locale string `json:"locale,omitempty"`
 }
 ```
 
@@ -256,7 +261,6 @@ type CartClient interface {
 	CartEditItem(cartID string, item LineItem) (*Cart, error)
 	CartDeleteItem(cartID string, item LineItem) (*Cart, error)
 	CartUpdateCustomerID(cartID, customerID string) (*Cart, error)
-	GetCheckoutURLs(cartID string) (*CartURLs, error)
 }
 ```
 
@@ -491,9 +495,10 @@ GetAllPosts downloads all posts from BigCommerce, handling pagination
 #### func (*Client) GetAllProducts
 
 ```go
-func (bc *Client) GetAllProducts() ([]Product, error)
+func (bc *Client) GetAllProducts(args map[string]string) ([]Product, error)
 ```
-GetAllProducts gets all products from BigCommerce
+GetAllProducts gets all products from BigCommerce args is a key-value map of
+additional arguments to pass to the API
 
 #### func (*Client) GetBrands
 
@@ -523,13 +528,6 @@ number to download
 ```go
 func (bc *Client) GetChannels(page int) ([]Channel, bool, error)
 ```
-
-#### func (*Client) GetCheckoutURLs
-
-```go
-func (bc *Client) GetCheckoutURLs(cartID string) (*CartURLs, error)
-```
-GetCheckoutURL gets the checkout and cart redirect URL for a cart
 
 #### func (*Client) GetCustomerByEmail
 
@@ -615,12 +613,10 @@ product ID to get metafields for
 #### func (*Client) GetProducts
 
 ```go
-func (bc *Client) GetProducts(fields, include []string, extraArgs map[string]string, page int) ([]Product, bool, error)
+func (bc *Client) GetProducts(args map[string]string, page int) ([]Product, bool, error)
 ```
-GetProducts gets a page of products from BigCommerce fields is a list of fields
-to include in the response include is a list of subresources to include in the
-response extraArgs is a key-value map of additional arguments to pass to the API
-page: the page number to download
+GetProducts gets a page of products from BigCommerce args is a key-value map of
+additional arguments to pass to the API page: the page number to download
 
 #### func (*Client) GetStoreInfo
 
@@ -649,30 +645,6 @@ GetThemes returns a list of all store themes
 ```go
 func (bc *Client) GetWebhooks() ([]Webhook, error)
 ```
-
-#### func (*Client) SetProductArgs
-
-```go
-func (bc *Client) SetProductArgs(args map[string]string)
-```
-SetProductFields sets include_fields parameter for GetProducts, empty list will
-get all fields
-
-#### func (*Client) SetProductFields
-
-```go
-func (bc *Client) SetProductFields(fields []string)
-```
-SetProductFields sets include_fields parameter for GetProducts, empty list will
-get all fields
-
-#### func (*Client) SetProductInclude
-
-```go
-func (bc *Client) SetProductInclude(subresources []string)
-```
-SetProductFields sets include_fields parameter for GetProducts, empty list will
-get all fields
 
 #### func (*Client) UpdateAddress
 
