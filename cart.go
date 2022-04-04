@@ -173,11 +173,15 @@ func (bc *Client) CartEditItem(cartID string, item LineItem) (*Cart, error) {
 // Arguments:
 // 		cartID: the cart ID
 // 		item: the line item, must have an existing line item ID
+// returns nil for empty cart
 func (bc *Client) CartDeleteItem(cartID string, item LineItem) (*Cart, error) {
 	req := bc.getAPIRequest(http.MethodDelete, "/v3/carts/"+cartID+"/items/"+item.ID+"?include=redirect_urls", nil)
 	res, err := bc.HTTPClient.Do(req)
 	if err != nil {
 		return nil, err
+	}
+	if res.StatusCode == 204 {
+		return nil, nil
 	}
 	_, err = processBody(res)
 	if err != nil {

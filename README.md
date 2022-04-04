@@ -34,7 +34,6 @@ var ErrNotFound = errors.New("404 not found")
 
 ## Types
 
-
 #### type Address
 
 ```go
@@ -227,12 +226,12 @@ type Cart struct {
 	Currency    struct {
 		Code string `json:"code,omitempty"`
 	} `json:"currency,omitempty"`
-	TaxIncluded    bool       `json:"tax_included,omitempty"`
-	BaseAmount     float64    `json:"base_amount,omitempty"`
-	DiscountAmount float64    `json:"discount_amount,omitempty"`
-	CartAmount     float64    `json:"cart_amount,omitempty"`
-	Discounts      []Discount `json:"discounts,omitempty"`
-	Coupons        []Coupon   `json:"coupons,omitempty"`
+	TaxIncluded    bool         `json:"tax_included,omitempty"`
+	BaseAmount     float64      `json:"base_amount,omitempty"`
+	DiscountAmount float64      `json:"discount_amount,omitempty"`
+	CartAmount     float64      `json:"cart_amount,omitempty"`
+	Discounts      []Discount   `json:"discounts,omitempty"`
+	Coupons        []CartCoupon `json:"coupons,omitempty"`
 	LineItems      struct {
 		PhysicalItems    []LineItem `json:"physical_items,omitempty"`
 		DigitalItems     []LineItem `json:"digital_items,omitempty"`
@@ -268,6 +267,18 @@ type CartClient interface {
 
 CartClient interface handles cart and login related requests
 
+#### type CartCoupon
+
+```go
+type CartCoupon struct {
+	Code             string  `json:"code"`
+	ID               string  `json:"id"`
+	CouponType       string  `json:"coupon_type"`
+	DiscountedAmount float64 `json:"discounted_amount"`
+}
+```
+
+
 #### type CartURLs
 
 ```go
@@ -291,7 +302,7 @@ type CatalogClient interface {
 	GetMainThumbnailURL(productID int64) (string, error)
 	SetProductFields(fields []string)
 	SetProductInclude(subresources []string)
-	GetAllProducts() ([]Product, error)
+	GetAllProducts(map[string]string) ([]Product, error)
 	GetProducts(page int) ([]Product, bool, error)
 	GetProductByID(productID int64) (*Product, error)
 }
@@ -374,6 +385,8 @@ DeleteItem deletes a line item from a cart, returns the updated cart Arguments:
     cartID: the cart ID
     item: the line item, must have an existing line item ID
 
+returns nil for empty cart
+
 #### func (*Client) CartEditItem
 
 ```go
@@ -415,6 +428,12 @@ func (bc *Client) CreateCart(items []LineItem) (*Cart, error)
 ```
 CreateCart creates a new cart in BigCommerce and returns it
 
+#### func (*Client) CreateCoupon
+
+```go
+func (bc *Client) CreateCoupon(coupon Coupon) (*Coupon, error)
+```
+
 #### func (*Client) CreateWebhook
 
 ```go
@@ -449,6 +468,12 @@ DeleteAddress deletes an existing address, address ID is required
 func (bc *Client) DeleteCart(cartID string) error
 ```
 DeleteCart deletes a cart by ID from BigCommerce
+
+#### func (*Client) DeleteCoupon
+
+```go
+func (bc *Client) DeleteCoupon(couponID int64) error
+```
 
 #### func (*Client) GetActiveThemeConfig
 
@@ -494,6 +519,12 @@ GetAllCategories returns a list of categories, handling pagination
 func (bc *Client) GetAllChannels() ([]Channel, error)
 ```
 
+#### func (*Client) GetAllCoupons
+
+```go
+func (bc *Client) GetAllCoupons(args map[string]string) ([]Coupon, error)
+```
+
 #### func (*Client) GetAllPosts
 
 ```go
@@ -536,6 +567,18 @@ number to download
 
 ```go
 func (bc *Client) GetChannels(page int) ([]Channel, bool, error)
+```
+
+#### func (*Client) GetCoupon
+
+```go
+func (bc *Client) GetCoupon(couponID int64) (*Coupon, error)
+```
+
+#### func (*Client) GetCoupons
+
+```go
+func (bc *Client) GetCoupons(args map[string]string, page int) ([]Coupon, bool, error)
 ```
 
 #### func (*Client) GetCustomerByEmail
@@ -662,6 +705,12 @@ func (bc *Client) UpdateAddress(customerID int64, address *Address) (*Address, e
 ```
 UpdateAddress updates an existing address, address ID is required
 
+#### func (*Client) UpdateCoupon
+
+```go
+func (bc *Client) UpdateCoupon(couponID int64, coupon Coupon) (*Coupon, error)
+```
+
 #### func (*Client) ValidateCredentials
 
 ```go
@@ -688,10 +737,25 @@ callbacks in the GET request signed_payload parameter
 
 ```go
 type Coupon struct {
-	Code             string  `json:"code"`
-	ID               string  `json:"id"`
-	CouponType       string  `json:"coupon_type"`
-	DiscountedAmount float64 `json:"discounted_amount"`
+	ID          int64  `json:"id"`
+	Name        string `json:"name"`
+	Type        string `json:"type"`
+	Amount      string `json:"amount"`
+	MinPurchase string `json:"min_purchase"`
+	Expires     string `json:"expires"`
+	Enabled     bool   `json:"enabled"`
+	Code        string `json:"code"`
+	AppliesTo   struct {
+		Entity string  `json:"entity"`
+		Ids    []int64 `json:"ids"`
+	} `json:"applies_to"`
+	NumUses            int           `json:"num_uses"`
+	MaxUses            int           `json:"max_uses"`
+	MaxUsesPerCustomer int           `json:"max_uses_per_customer"`
+	RestrictedTo       []interface{} `json:"restricted_to"`
+	ShippingMethods    struct {
+	} `json:"shipping_methods"`
+	DateCreated string `json:"date_created"`
 }
 ```
 
