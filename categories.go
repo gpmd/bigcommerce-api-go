@@ -22,7 +22,8 @@ type Category struct {
 }
 
 // GetAllCategories returns a list of categories, handling pagination
-func (bc *Client) GetAllCategories() ([]Category, error) {
+// args is a map of arguments to pass to the API
+func (bc *Client) GetAllCategories(args map[string]string) ([]Category, error) {
 	cs := []Category{}
 	var csp []Category
 	page := 1
@@ -30,7 +31,7 @@ func (bc *Client) GetAllCategories() ([]Category, error) {
 	var err error
 	retries := 0
 	for more {
-		csp, more, err = bc.GetCategories(page)
+		csp, more, err = bc.GetCategories(args, page)
 		if err != nil {
 			retries++
 			if retries > bc.MaxRetries {
@@ -54,9 +55,14 @@ func (bc *Client) GetAllCategories() ([]Category, error) {
 }
 
 // GetCategories returns a list of categories, handling pagination
+// args is a map of arguments to pass to the API
 // page: the page number to download
-func (bc *Client) GetCategories(page int) ([]Category, bool, error) {
-	url := "/v3/catalog/categories?include_fields=name,parent_id,is_visible,custom_url&page=" + strconv.Itoa(page)
+func (bc *Client) GetCategories(args map[string]string, page int) ([]Category, bool, error) {
+	fpart := ""
+	for k, v := range args {
+		fpart += "&" + k + "=" + v
+	}
+	url := "/v3/catalog/categories?page=" + strconv.Itoa(page) + fpart
 
 	req := bc.getAPIRequest(http.MethodGet, url, nil)
 	res, err := bc.HTTPClient.Do(req)

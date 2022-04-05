@@ -502,16 +502,18 @@ customerID is bigcommerce customer id
 #### func (*Client) GetAllBrands
 
 ```go
-func (bc *Client) GetAllBrands() ([]Brand, error)
+func (bc *Client) GetAllBrands(args map[string]string) ([]Brand, error)
 ```
-GetAllBrands returns all brands, handling pagination
+GetAllBrands returns all brands, handling pagination args is a map of arguments
+to pass to the API
 
 #### func (*Client) GetAllCategories
 
 ```go
-func (bc *Client) GetAllCategories() ([]Category, error)
+func (bc *Client) GetAllCategories(args map[string]string) ([]Category, error)
 ```
-GetAllCategories returns a list of categories, handling pagination
+GetAllCategories returns a list of categories, handling pagination args is a map
+of arguments to pass to the API
 
 #### func (*Client) GetAllChannels
 
@@ -543,10 +545,10 @@ additional arguments to pass to the API
 #### func (*Client) GetBrands
 
 ```go
-func (bc *Client) GetBrands(page int) ([]Brand, bool, error)
+func (bc *Client) GetBrands(args map[string]string, page int) ([]Brand, bool, error)
 ```
-GetBrands returns all brands, handling pagination page: the page number to
-download
+GetBrands returns all brands, handling pagination args is a map of arguments to
+pass to the API page: the page number to download
 
 #### func (*Client) GetCart
 
@@ -558,10 +560,10 @@ GetCart gets a cart by ID from BigCommerce and returns it
 #### func (*Client) GetCategories
 
 ```go
-func (bc *Client) GetCategories(page int) ([]Category, bool, error)
+func (bc *Client) GetCategories(args map[string]string, page int) ([]Category, bool, error)
 ```
-GetCategories returns a list of categories, handling pagination page: the page
-number to download
+GetCategories returns a list of categories, handling pagination args is a map of
+arguments to pass to the API page: the page number to download
 
 #### func (*Client) GetChannels
 

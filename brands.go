@@ -24,7 +24,8 @@ type Brand struct {
 }
 
 // GetAllBrands returns all brands, handling pagination
-func (bc *Client) GetAllBrands() ([]Brand, error) {
+// args is a map of arguments to pass to the API
+func (bc *Client) GetAllBrands(args map[string]string) ([]Brand, error) {
 	cs := []Brand{}
 	var csp []Brand
 	page := 1
@@ -33,7 +34,7 @@ func (bc *Client) GetAllBrands() ([]Brand, error) {
 	var err error
 	var retries int
 	for more {
-		csp, more, err = bc.GetBrands(page)
+		csp, more, err = bc.GetBrands(args, page)
 		if err != nil {
 			retries++
 			if retries > bc.MaxRetries {
@@ -54,9 +55,14 @@ func (bc *Client) GetAllBrands() ([]Brand, error) {
 }
 
 // GetBrands returns all brands, handling pagination
+// args is a map of arguments to pass to the API
 // page: the page number to download
-func (bc *Client) GetBrands(page int) ([]Brand, bool, error) {
-	url := "/v3/catalog/brands?page=" + strconv.Itoa(page)
+func (bc *Client) GetBrands(args map[string]string, page int) ([]Brand, bool, error) {
+	fpart := ""
+	for k, v := range args {
+		fpart += "&" + k + "=" + v
+	}
+	url := "/v3/catalog/brands?page=" + strconv.Itoa(page) + fpart
 
 	req := bc.getAPIRequest(http.MethodGet, url, nil)
 	res, err := bc.HTTPClient.Do(req)
