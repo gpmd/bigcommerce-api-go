@@ -1,9 +1,16 @@
 package bigcommerce
 
 import (
+	"io"
 	"net/http"
 	"time"
 )
+
+type HTTPClient interface {
+	Do(req *http.Request) (res *http.Response, err error)
+	Get(url string) (res *http.Response, err error)
+	Post(urstring, bodyType string, body io.Reader) (res *http.Response, err error)
+}
 
 // BigCommerce is the BigCommerce API client object for BigCommerce Apps
 // holds no client specific information
@@ -11,7 +18,7 @@ type App struct {
 	Hostname        string
 	AppClientID     string
 	AppClientSecret string
-	HTTPClient      *http.Client
+	HTTPClient      HTTPClient
 	MaxRetries      int
 	ChannelID       int
 }
