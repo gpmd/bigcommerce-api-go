@@ -76,7 +76,7 @@ type App struct {
 	Hostname        string
 	AppClientID     string
 	AppClientSecret string
-	HTTPClient      *http.Client
+	HTTPClient      HTTPClient
 	MaxRetries      int
 	ChannelID       int
 }
@@ -583,6 +583,13 @@ func (bc *Client) GetCoupon(couponID int64) (*Coupon, error)
 func (bc *Client) GetCoupons(args map[string]string, page int) ([]Coupon, bool, error)
 ```
 
+#### func (*Client) GetCurrencies
+
+```go
+func (bc *Client) GetCurrencies() ([]Currency, error)
+```
+GetCurrencies returns the store's defined currencies
+
 #### func (*Client) GetCustomerByEmail
 
 ```go
@@ -784,6 +791,32 @@ type CreateAccountPayload struct {
 ```
 
 
+#### type Currency
+
+```go
+type Currency struct {
+	ID                     int      `json:"id"`
+	IsDefault              bool     `json:"is_default"`
+	LastUpdated            string   `json:"last_updated"`
+	CountryIso2            string   `json:"country_iso2"`
+	DefaultForCountryCodes []string `json:"default_for_country_codes"`
+	CurrencyCode           string   `json:"currency_code"`
+	CurrencyExchangeRate   string   `json:"currency_exchange_rate"`
+	Name                   string   `json:"name"`
+	Token                  string   `json:"token"`
+	AutoUpdate             bool     `json:"auto_update"`
+	TokenLocation          string   `json:"token_location"`
+	DecimalToken           string   `json:"decimal_token"`
+	ThousandsToken         string   `json:"thousands_token"`
+	DecimalPlaces          int      `json:"decimal_places"`
+	Enabled                bool     `json:"enabled"`
+	IsTransactional        bool     `json:"is_transactional"`
+	UseDefaultName         bool     `json:"use_default_name"`
+}
+```
+
+Currency is entry for BC currency API
+
 #### type Customer
 
 ```go
@@ -857,6 +890,17 @@ type FormField struct {
 ```
 
 FormField is a struct for the BigCommerce Customer API Form Fiel values
+
+#### type HTTPClient
+
+```go
+type HTTPClient interface {
+	Do(req *http.Request) (res *http.Response, err error)
+	Get(url string) (res *http.Response, err error)
+	Post(urstring, bodyType string, body io.Reader) (res *http.Response, err error)
+}
+```
+
 
 #### type Image
 
