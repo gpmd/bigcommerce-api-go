@@ -15,7 +15,7 @@ type Client struct {
 	StoreHash  string `json:"store-hash"`
 	XAuthToken string `json:"x-auth-token"`
 	MaxRetries int
-	HTTPClient *http.Client
+	HTTPClient HTTPClient
 	ChannelID  int
 }
 

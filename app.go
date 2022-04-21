@@ -37,3 +37,13 @@ func NewApp(hostname, appClientID, appClientSecret string) *App {
 		},
 	}
 }
+
+func (a *App) NewClient(storeHash, xAuthToken string) *Client {
+	return &Client{
+		StoreHash:  storeHash,
+		XAuthToken: xAuthToken,
+		MaxRetries: 1,
+		HTTPClient: a.HTTPClient,
+		ChannelID:  1,
+	}
+}
