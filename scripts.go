@@ -4,22 +4,26 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"time"
 )
 
 type Script struct {
-	Name            string `json:"name"`
-	Description     string `json:"description"`
-	HTML            string `json:"html"`
-	Src             string `json:"src"`
-	AutoUninstall   bool   `json:"auto_uninstall"`
-	LoadMethod      string `json:"load_method"`
-	Location        string `json:"location"`
-	Visibility      string `json:"visibility"`
-	Kind            string `json:"kind"`
-	APIClientID     string `json:"api_client_id"`
-	ConsentCategory string `json:"consent_category"`
-	Enabled         bool   `json:"enabled"`
-	ChannelID       int64  `json:"channel_id"`
+	ID              string    `json:"uuid"`
+	DateCreated     time.Time `json:"date_created"`
+	DateModified    time.Time `json:"date_modified"`
+	Name            string    `json:"name"`
+	Description     string    `json:"description"`
+	HTML            string    `json:"html"`
+	Src             string    `json:"src"`
+	AutoUninstall   bool      `json:"auto_uninstall"`
+	LoadMethod      string    `json:"load_method"`
+	Location        string    `json:"location"`
+	Visibility      string    `json:"visibility"`
+	Kind            string    `json:"kind"`
+	APIClientID     string    `json:"api_client_id"`
+	ConsentCategory string    `json:"consent_category"`
+	Enabled         bool      `json:"enabled"`
+	ChannelID       int64     `json:"channel_id"`
 }
 
 func (bc *Client) CreateScript(s *Script) (*Script, error) {
