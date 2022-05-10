@@ -3,6 +3,8 @@ package bigcommerce
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"time"
 )
@@ -37,6 +39,13 @@ func (bc *Client) CreateWidgetTemplate(pt *PageBuilderTemplate) (*PageBuilderTem
 	var ptRes struct {
 		Data PageBuilderTemplate `json:"data"`
 	}
-	err = json.NewDecoder(res.Body).Decode(&ptRes)
+	b, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return pt, err
+	}
+	err = json.Unmarshal(b, &ptRes)
+	if ptRes.Data.UUID == "" {
+		return pt, fmt.Errorf("error creating widget template: %s", string(b))
+	}
 	return &ptRes.Data, err
 }

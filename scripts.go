@@ -3,6 +3,8 @@ package bigcommerce
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"time"
 )
@@ -40,6 +42,13 @@ func (bc *Client) CreateScript(s *Script) (*Script, error) {
 	var sRes struct {
 		Data Script `json:"data"`
 	}
-	err = json.NewDecoder(res.Body).Decode(&sRes)
+	b, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return s, err
+	}
+	err = json.Unmarshal(b, &sRes)
+	if sRes.Data.ID == "" {
+		return s, fmt.Errorf("error creating script: %s", string(b))
+	}
 	return &sRes.Data, err
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sort"
 	"strconv"
 )
 
@@ -42,14 +43,24 @@ func (bc *Client) GetAllCategories(args map[string]string) ([]Category, error) {
 		cs = append(cs, csp...)
 		page++
 	}
-	extidmap := map[int64]int{}
-	for i, c := range cs {
-		extidmap[c.ID] = i
+	cats := map[int64]Category{}
+	ids := []int64{}
+	for _, c := range cs {
+		cats[c.ID] = c
+		//		log.Printf("%d: %s", c.ID, c.Name)
+		ids = append(ids, c.ID)
 	}
-	for i := range cs {
-		cs[i].URL = cs[i].CustomURL.URL
+	// sort ids
+	sort.Slice(ids, func(i, j int) bool {
+		return ids[i] < ids[j]
+	})
+	cs = []Category{}
+	for _, i := range ids {
+		c := cats[i]
+		c.URL = c.CustomURL.URL
 		// get A > B > C fancy name
-		cs[i].FullName = bc.getFullCategoryName(cs, i, extidmap)
+		c.FullName = bc.getFullCategoryName(cats, i)
+		cs = append(cs, c)
 	}
 	return cs, err
 }
@@ -89,9 +100,16 @@ func (bc *Client) GetCategories(args map[string]string, page int) ([]Category, b
 	return pp.Data, pp.Meta.Pagination.CurrentPage < pp.Meta.Pagination.TotalPages, nil
 }
 
-func (bc *Client) getFullCategoryName(cs []Category, i int, extidmap map[int64]int) string {
-	if cs[i].ParentID == 0 {
-		return cs[i].Name
+func (bc *Client) getFullCategoryName(cats map[int64]Category, i int64) string {
+	c := cats[i]
+	if c.ParentID == 0 {
+		return c.Name
 	}
-	return bc.getFullCategoryName(cs, extidmap[cs[i].ParentID], extidmap) + " > " + cs[i].Name
+	if c.FullName != "" {
+		return c.FullName
+	}
+	pn := bc.getFullCategoryName(cats, cats[i].ParentID)
+	c.FullName = pn + " > " + c.Name
+	cats[i] = c
+	return c.FullName
 }
