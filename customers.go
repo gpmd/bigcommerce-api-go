@@ -31,6 +31,33 @@ type Customer struct {
 	Addresses        []Address   `json:"addresses"`
 }
 
+type SaveAccountPayload struct {
+	ID                int64     `json:"id"`
+	Company           string    `json:"company"`
+	FirstName         string    `json:"first_name"`
+	LastName          string    `json:"last_name"`
+	Email             string    `json:"email"`
+	Phone             string    `json:"phone"`
+	Notes             string    `json:"notes"`
+	TaxExemptCategory string    `json:"tax_exempt_category"`
+	CustomerGroupID   int64     `json:"customer_group_id"`
+	Addresses         []Address `json:"addresses"`
+	Authentication    struct {
+		ForcePasswordReset bool   `json:"force_password_reset"`
+		NewPassword        string `json:"new_password"`
+	} `json:"authentication"`
+	AcceptsProductReviewAbandonedCartEmails bool `json:"accepts_product_review_abandoned_cart_emails"`
+	StoreCreditAmounts                      []struct {
+		Amount float64 `json:"amount"`
+	} `json:"store_credit_amounts"`
+	OriginChannelID int   `json:"origin_channel_id"`
+	ChannelIDs      []int `json:"channel_ids"`
+	FormFields      []struct {
+		Name  string `json:"name"`
+		Value string `json:"value"`
+	} `json:"form_fields"`
+}
+
 type CreateAccountPayload struct {
 	Company                                 string         `json:"company"`
 	FirstName                               string         `json:"first_name"`
@@ -45,7 +72,7 @@ type CreateAccountPayload struct {
 	AcceptsProductReviewAbandonedCartEmails bool           `json:"accepts_product_review_abandoned_cart_emails"`
 	StoreCreditAmounts                      []StoreCredit  `json:"store_credit_amounts"`
 	OriginChannelID                         int            `json:"origin_channel_id"`
-	ChannelIds                              []int          `json:"channel_ids"`
+	ChannelIDs                              []int          `json:"channel_ids"`
 }
 
 // StoreCredit is for CreateAccountPayload's store_credit_ammounts field
@@ -107,12 +134,59 @@ func (bc *Client) CreateAccount(payload *CreateAccountPayload) (*Customer, error
 	if payload.OriginChannelID == 0 {
 		payload.OriginChannelID = bc.ChannelID
 	}
-	if payload.ChannelIds == nil {
-		payload.ChannelIds = []int{bc.ChannelID}
+	if payload.ChannelIDs == nil {
+		payload.ChannelIDs = []int{bc.ChannelID}
 	}
 	var b []byte
 	b, _ = json.Marshal([]CreateAccountPayload{*payload})
 	req := bc.getAPIRequest(http.MethodPost, "/v3/customers", bytes.NewBuffer(b))
+	res, err := bc.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+	body, err := processBody(res)
+	if err != nil {
+		if res.StatusCode == http.StatusUnprocessableEntity {
+			var errResp ErrorResult
+			err = json.Unmarshal(body, &errResp)
+			if err != nil {
+				log.Printf("Error: %s\nResult: %s", err, string(body))
+				return nil, err
+			}
+			if len(errResp.Errors) > 0 {
+				errors := []string{}
+				for _, e := range errResp.Errors {
+					errors = append(errors, e)
+				}
+				return nil, fmt.Errorf("%s", strings.Join(errors, ", "))
+			}
+			return nil, errors.New("unknown error")
+		}
+		log.Printf("Error: %s\nResult: %s", err, string(body))
+		return nil, err
+	}
+	var ret struct {
+		Customers []Customer `json:"data"`
+	}
+	err = json.Unmarshal(body, &ret)
+	if err != nil {
+		return nil, err
+	}
+	return &ret.Customers[0], nil
+}
+
+// CreateAccount creates a new customer account in BigCommerce and returns the customer or error
+func (bc *Client) SaveAccount(payload *SaveAccountPayload) (*Customer, error) {
+	if payload.OriginChannelID == 0 {
+		payload.OriginChannelID = bc.ChannelID
+	}
+	if payload.ChannelIDs == nil {
+		payload.ChannelIDs = []int{bc.ChannelID}
+	}
+	var b []byte
+	b, _ = json.Marshal([]SaveAccountPayload{*payload})
+	req := bc.getAPIRequest(http.MethodPut, "/v3/customers", bytes.NewBuffer(b))
 	res, err := bc.HTTPClient.Do(req)
 	if err != nil {
 		return nil, err

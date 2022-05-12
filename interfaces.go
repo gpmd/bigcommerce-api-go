@@ -51,6 +51,7 @@ type CustomerClient interface {
 	CustomerGetFormFields(customerID int64) ([]FormField, error)
 	GetCustomerByID(customerID int64) (*Customer, error)
 	GetCustomerByEmail(email string) (*Customer, error)
+	SaveAccount(customer *SaveAccountPayload) (*Customer, error)
 }
 
 type AddressClient interface {

@@ -38,3 +38,7 @@ func (cm *CustomerClient) GetCustomerByEmail(email string) (*bigcommerce.Custome
 func (cm *CustomerClient) GetCustomerByID(customerID int64) (*bigcommerce.Customer, error) {
 	return cm.Customer, nil
 }
+
+func (cm *CustomerClient) SaveAccount(customer *bigcommerce.SaveAccountPayload) (*bigcommerce.Customer, error) {
+	return cm.Customer, nil
+}

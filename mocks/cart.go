@@ -96,3 +96,12 @@ func (cm *CartClient) CartUpdateCustomerID(cartID, customerID string) (*bigcomme
 	}
 	return nil, bigcommerce.ErrNotFound
 }
+
+func (cm *CartClient) DeleteCart(cartID string) error {
+	if cm.carts == nil {
+		cm.carts = map[string]*bigcommerce.Cart{}
+		return bigcommerce.ErrNotFound
+	}
+	delete(cm.carts, cartID)
+	return nil
+}
