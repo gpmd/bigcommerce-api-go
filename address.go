@@ -1,6 +1,7 @@
 package bigcommerce
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -9,20 +10,21 @@ import (
 
 // Address is for Customer Address endpoint
 type Address struct {
-	ID              int64  `json:"id,omitempty"`
-	CustomerID      int64  `json:"customer_id,omitempty"`
-	Address1        string `json:"address1"`
-	Address2        string `json:"address2"`
-	AddressType     string `json:"address_type"`
-	City            string `json:"city"`
-	Company         string `json:"company"`
-	Country         string `json:"country,omitempty"`
-	CountryCode     string `json:"country_code"`
-	FirstName       string `json:"first_name"`
-	LastName        string `json:"last_name"`
-	Phone           string `json:"phone"`
-	PostalCode      string `json:"postal_code"`
-	StateOrProvince string `json:"state_or_province"`
+	ID              int64       `json:"id,omitempty"`
+	CustomerID      int64       `json:"customer_id,omitempty"`
+	Address1        string      `json:"address1"`
+	Address2        string      `json:"address2,omitempty"`
+	AddressType     string      `json:"address_type,omitempty"`
+	City            string      `json:"city"`
+	Company         string      `json:"company,omitempty"`
+	Country         string      `json:"country,omitempty"`
+	CountryCode     string      `json:"country_code"`
+	FirstName       string      `json:"first_name"`
+	LastName        string      `json:"last_name"`
+	Phone           string      `json:"phone,omitempty"`
+	PostalCode      string      `json:"postal_code,omitempty"`
+	StateOrProvince string      `json:"state_or_province,omitempty"`
+	FormFields      []FormField `json:"form_fields,omitempty"`
 }
 
 // GetAddresses returns all addresses for a curstomer, handling pagination
@@ -85,12 +87,16 @@ func (bc *Client) CreateAddress(customerID int64, address *Address) (*Address, e
 	url := "/v3/customers/addresses"
 	// extra safety feature so we don't edit other customers' address
 	address.CustomerID = customerID
-	req := bc.getAPIRequest(http.MethodPost, url, nil)
+	addressJSON, _ := json.Marshal([]Address{*address})
+	//	log.Printf("addressJSON: %s", string(addressJSON))
+	req := bc.getAPIRequest(http.MethodPost, url, bytes.NewReader(addressJSON))
 	res, err := bc.HTTPClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
-	var addr Address
+	var addr struct {
+		Addresses []Address `json:"data"`
+	}
 	defer res.Body.Close()
 	body, err := processBody(res)
 	if err != nil {
@@ -98,9 +104,12 @@ func (bc *Client) CreateAddress(customerID int64, address *Address) (*Address, e
 	}
 	err = json.Unmarshal(body, &addr)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error parsing body: %s %s", err, string(body))
 	}
-	return &addr, nil
+	if len(addr.Addresses) == 0 {
+		return nil, fmt.Errorf("no address returned, %s", string(body))
+	}
+	return &addr.Addresses[0], nil
 }
 
 // UpdateAddress updates an existing address, address ID is required
@@ -111,12 +120,16 @@ func (bc *Client) UpdateAddress(customerID int64, address *Address) (*Address, e
 	if address.ID == 0 {
 		return nil, fmt.Errorf("address ID is required")
 	}
-	req := bc.getAPIRequest(http.MethodPut, url, nil)
+	addressJSON, _ := json.Marshal([]Address{*address})
+	//	log.Printf("addressJSON: %s", string(addressJSON))
+	req := bc.getAPIRequest(http.MethodPut, url, bytes.NewReader(addressJSON))
 	res, err := bc.HTTPClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
-	var addr Address
+	var addr struct {
+		Addresses []Address `json:"data"`
+	}
 	defer res.Body.Close()
 	body, err := processBody(res)
 	if err != nil {
@@ -124,9 +137,12 @@ func (bc *Client) UpdateAddress(customerID int64, address *Address) (*Address, e
 	}
 	err = json.Unmarshal(body, &addr)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error parsing body: %s %s", err, string(body))
 	}
-	return &addr, nil
+	if len(addr.Addresses) == 0 {
+		return nil, fmt.Errorf("no address returned, %s", string(body))
+	}
+	return &addr.Addresses[0], nil
 }
 
 // DeleteAddress deletes an existing address, address ID is required
