@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -147,20 +148,25 @@ func (bc *Client) UpdateAddress(customerID int64, address *Address) (*Address, e
 
 // DeleteAddress deletes an existing address, address ID is required
 func (bc *Client) DeleteAddress(customerID, addressID int64) error {
-	url := "/v3/customers/addresses/" + strconv.FormatInt(addressID, 10)
+	url := "/v3/customers/addresses?id:in=" + strconv.FormatInt(addressID, 10)
 	req := bc.getAPIRequest(http.MethodDelete, url, nil)
 	res, err := bc.HTTPClient.Do(req)
 	if err != nil {
 		return err
 	}
 	defer res.Body.Close()
+	if res.StatusCode == http.StatusNoContent {
+		return nil
+	}
 	body, err := processBody(res)
 	if err != nil {
+		log.Printf("error processing body: %s", err)
 		return err
 	}
 	var addr Address
 	err = json.Unmarshal(body, &addr)
 	if err != nil {
+		log.Printf("error parsing body: %s %s", err, string(body))
 		return err
 	}
 	return nil
