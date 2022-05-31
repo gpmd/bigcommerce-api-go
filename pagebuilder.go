@@ -49,3 +49,37 @@ func (bc *Client) CreateWidgetTemplate(pt *PageBuilderTemplate) (*PageBuilderTem
 	}
 	return &ptRes.Data, err
 }
+
+func (bc *Client) GetWidgetTemplates() ([]PageBuilderTemplate, error) {
+	req := bc.getAPIRequest(http.MethodGet, "/v3/content/widget-templates", nil)
+	res, err := bc.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+	var ptRes struct {
+		Data []PageBuilderTemplate `json:"data"`
+	}
+	b, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(b, &ptRes)
+	if ptRes.Data == nil {
+		return nil, fmt.Errorf("error getting widget templates: %s", string(b))
+	}
+	return ptRes.Data, err
+}
+
+func (bc *Client) DeleteWidgetTemplate(uuid string) error {
+	req := bc.getAPIRequest(http.MethodDelete, fmt.Sprintf("/v3/content/widget-templates/%s", uuid), nil)
+	res, err := bc.HTTPClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusNoContent {
+		return fmt.Errorf("error deleting widget template: %d", res.StatusCode)
+	}
+	return nil
+}
