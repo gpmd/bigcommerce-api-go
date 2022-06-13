@@ -11,63 +11,63 @@ import (
 // Cart is a BigCommerce cart object
 type Cart struct {
 	ID          string `json:"id"`
-	CheckoutURL string `json:"checkout_url,omitempty"`
-	CustomerID  int64  `json:"customer_id,omitempty"`
-	ChannelID   int64  `json:"channel_id,omitempty"`
-	Email       string `json:"email,omitempty"`
+	CheckoutURL string `json:"checkout_url"`
+	CustomerID  int64  `json:"customer_id"`
+	ChannelID   int64  `json:"channel_id"`
+	Email       string `json:"email"`
 	Currency    struct {
-		Code string `json:"code,omitempty"`
-	} `json:"currency,omitempty"`
-	TaxIncluded    bool         `json:"tax_included,omitempty"`
-	BaseAmount     float64      `json:"base_amount,omitempty"`
-	DiscountAmount float64      `json:"discount_amount,omitempty"`
-	CartAmount     float64      `json:"cart_amount,omitempty"`
-	Discounts      []Discount   `json:"discounts,omitempty"`
-	Coupons        []CartCoupon `json:"coupons,omitempty"`
+		Code string `json:"code"`
+	} `json:"currency"`
+	TaxIncluded    bool         `json:"tax_included"`
+	BaseAmount     float64      `json:"base_amount"`
+	DiscountAmount float64      `json:"discount_amount"`
+	CartAmount     float64      `json:"cart_amount"`
+	Discounts      []Discount   `json:"discounts"`
+	Coupons        []CartCoupon `json:"coupons"`
 	LineItems      struct {
-		PhysicalItems    []LineItem `json:"physical_items,omitempty"`
-		DigitalItems     []LineItem `json:"digital_items,omitempty"`
-		GiftCertificates []LineItem `json:"gift_certificates,omitempty"`
-		CustomItems      []LineItem `json:"custom_items,omitempty"`
+		PhysicalItems    []LineItem `json:"physical_items"`
+		DigitalItems     []LineItem `json:"digital_items"`
+		GiftCertificates []LineItem `json:"gift_certificates"`
+		CustomItems      []LineItem `json:"custom_items"`
 	} `json:"line_items"`
-	CreatedTime  time.Time `json:"created_time,omitempty"`
-	UpdatedTime  time.Time `json:"updated_time,omitempty"`
+	CreatedTime  time.Time `json:"created_time"`
+	UpdatedTime  time.Time `json:"updated_time"`
 	RedirectUrls struct {
 		CartURL             string `json:"cart_url"`
 		CheckoutURL         string `json:"checkout_url"`
 		EmbeddedCheckoutURL string `json:"embedded_checkout_url"`
-	} `json:"redirect_urls,omitempty"`
-	Locale string `json:"locale,omitempty"`
+	} `json:"redirect_urls"`
+	Locale string `json:"locale"`
 }
 
 // LineItem is a BigCommerce line item object for cart
 type LineItem struct {
-	ID                string     `json:"id,omitempty"`
-	ParentID          int64      `json:"parent_id,omitempty"`
-	VariantID         int64      `json:"variant_id,omitempty"`
-	ProductID         int64      `json:"product_id,omitempty"`
-	Sku               string     `json:"sku,omitempty"`
-	Name              string     `json:"name,omitempty"`
-	URL               string     `json:"url,omitempty"`
-	Quantity          float64    `json:"quantity,omitempty"`
-	Taxable           bool       `json:"taxable,omitempty"`
-	ImageURL          string     `json:"image_url,omitempty"`
-	Discounts         []Discount `json:"discounts,omitempty"`
-	Coupons           []Coupon   `json:"coupons,omitempty"`
-	DiscountAmount    float64    `json:"discount_amount,omitempty"`
-	CouponAmount      float64    `json:"coupon_amount,omitempty"`
-	ListPrice         float64    `json:"list_price,omitempty"`
-	SalePrice         float64    `json:"sale_price,omitempty"`
-	ExtendedListPrice float64    `json:"extended_list_price,omitempty"`
-	ExtendedSalePrice float64    `json:"extended_sale_price,omitempty"`
-	IsRequireShipping bool       `json:"is_require_shipping,omitempty"`
-	IsMutable         bool       `json:"is_mutable,omitempty"`
+	ID                string     `json:"id"`
+	ParentID          int64      `json:"parent_id"`
+	VariantID         int64      `json:"variant_id"`
+	ProductID         int64      `json:"product_id"`
+	Sku               string     `json:"sku"`
+	Name              string     `json:"name"`
+	URL               string     `json:"url"`
+	Quantity          float64    `json:"quantity"`
+	Taxable           bool       `json:"taxable"`
+	ImageURL          string     `json:"image_url"`
+	Discounts         []Discount `json:"discounts"`
+	Coupons           []Coupon   `json:"coupons"`
+	DiscountAmount    float64    `json:"discount_amount"`
+	CouponAmount      float64    `json:"coupon_amount"`
+	ListPrice         float64    `json:"list_price"`
+	SalePrice         float64    `json:"sale_price"`
+	ExtendedListPrice float64    `json:"extended_list_price"`
+	ExtendedSalePrice float64    `json:"extended_sale_price"`
+	IsRequireShipping bool       `json:"is_require_shipping"`
+	IsMutable         bool       `json:"is_mutable"`
 }
 
 type CartURLs struct {
-	CartURL             string `json:"cart_url,omitempty"`
-	CheckoutURL         string `json:"checkout_url,omitempty"`
-	EmbeddedCheckoutURL string `json:"embedded_checkout_url,omitempty"`
+	CartURL             string `json:"cart_url"`
+	CheckoutURL         string `json:"checkout_url"`
+	EmbeddedCheckoutURL string `json:"embedded_checkout_url"`
 }
 
 // CreateCart creates a new cart in BigCommerce and returns it
@@ -87,9 +87,9 @@ func (bc *Client) CreateCart(items []LineItem) (*Cart, error) {
 		return nil, err
 	}
 	var cartResponse struct {
-		Data Cart `json:"data,omitempty"`
+		Data Cart `json:"data"`
 		Meta struct {
-		} `json:"meta,omitempty"`
+		} `json:"meta"`
 	}
 	err = json.Unmarshal(b, &cartResponse)
 	if err != nil {
@@ -110,9 +110,9 @@ func (bc *Client) GetCart(cartID string) (*Cart, error) {
 		return nil, err
 	}
 	var cartResponse struct {
-		Data Cart `json:"data,omitempty"`
+		Data Cart `json:"data"`
 		Meta struct {
-		} `json:"meta,omitempty"`
+		} `json:"meta"`
 	}
 	err = json.Unmarshal(b, &cartResponse)
 	if err != nil {
@@ -137,9 +137,9 @@ func (bc *Client) CartAddItems(cartID string, items []LineItem) (*Cart, error) {
 		return nil, err
 	}
 	var cartResponse struct {
-		Data Cart `json:"data,omitempty"`
+		Data Cart `json:"data"`
 		Meta struct {
-		} `json:"meta,omitempty"`
+		} `json:"meta"`
 	}
 	err = json.Unmarshal(b, &cartResponse)
 	if err != nil {
@@ -206,7 +206,7 @@ func (bc *Client) CartUpdateCustomerID(cartID, customerID string) (*Cart, error)
 		return nil, err
 	}
 	var cartResponse struct {
-		Data Cart `json:"data,omitempty"`
+		Data Cart `json:"data"`
 	}
 	err = json.Unmarshal(b, &cartResponse)
 	if err != nil {

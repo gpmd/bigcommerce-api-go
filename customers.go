@@ -33,46 +33,46 @@ type Customer struct {
 
 type SaveAccountPayload struct {
 	ID                int64     `json:"id"`
-	Company           string    `json:"company,omitempty"`
-	FirstName         string    `json:"first_name,omitempty"`
-	LastName          string    `json:"last_name,omitempty"`
-	Email             string    `json:"email,omitempty"`
-	Phone             string    `json:"phone,omitempty"`
-	Notes             string    `json:"notes,omitempty"`
-	TaxExemptCategory string    `json:"tax_exempt_category,omitempty"`
-	CustomerGroupID   int64     `json:"customer_group_id,omitempty"`
-	Addresses         []Address `json:"addresses,omitempty"`
+	Company           string    `json:"company"`
+	FirstName         string    `json:"first_name"`
+	LastName          string    `json:"last_name"`
+	Email             string    `json:"email"`
+	Phone             string    `json:"phone"`
+	Notes             string    `json:"notes"`
+	TaxExemptCategory string    `json:"tax_exempt_category"`
+	CustomerGroupID   int64     `json:"customer_group_id"`
+	Addresses         []Address `json:"addresses"`
 	Authentication    struct {
-		ForcePasswordReset bool   `json:"force_password_reset,omitempty"`
-		NewPassword        string `json:"new_password,omitempty"`
-	} `json:"authentication,omitempty"`
-	AcceptsProductReviewAbandonedCartEmails bool `json:"accepts_product_review_abandoned_cart_emails,omitempty"`
+		ForcePasswordReset bool   `json:"force_password_reset"`
+		NewPassword        string `json:"new_password"`
+	} `json:"authentication"`
+	AcceptsProductReviewAbandonedCartEmails bool `json:"accepts_product_review_abandoned_cart_emails"`
 	StoreCreditAmounts                      []struct {
-		Amount float64 `json:"amount,omitempty"`
-	} `json:"store_credit_amounts,omitempty"`
-	OriginChannelID int   `json:"origin_channel_id,omitempty"`
-	ChannelIDs      []int `json:"channel_ids,omitempty"`
+		Amount float64 `json:"amount"`
+	} `json:"store_credit_amounts"`
+	OriginChannelID int   `json:"origin_channel_id"`
+	ChannelIDs      []int `json:"channel_ids"`
 	FormFields      []struct {
-		Name  string `json:"name,omitempty"`
-		Value string `json:"value,omitempty"`
-	} `json:"form_fields,omitempty"`
+		Name  string `json:"name"`
+		Value string `json:"value"`
+	} `json:"form_fields"`
 }
 
 type CreateAccountPayload struct {
-	Company                                 string         `json:"company,omitempty"`
-	FirstName                               string         `json:"first_name,omitempty"`
-	LastName                                string         `json:"last_name,omitempty"`
-	Email                                   string         `json:"email,omitempty"`
-	Phone                                   string         `json:"phone,omitempty"`
-	Notes                                   string         `json:"notes,omitempty"`
-	TaxExemptCategory                       string         `json:"tax_exempt_category,omitempty"`
-	CustomerGroupID                         int64          `json:"customer_group_id,omitempty"`
-	Addresses                               []Address      `json:"addresses,omitempty"`
-	Authentication                          Authentication `json:"authentication,omitempty"`
-	AcceptsProductReviewAbandonedCartEmails bool           `json:"accepts_product_review_abandoned_cart_emails,omitempty"`
-	StoreCreditAmounts                      []StoreCredit  `json:"store_credit_amounts,omitempty"`
-	OriginChannelID                         int            `json:"origin_channel_id,omitempty"`
-	ChannelIDs                              []int          `json:"channel_ids,omitempty"`
+	Company                                 string         `json:"company"`
+	FirstName                               string         `json:"first_name"`
+	LastName                                string         `json:"last_name"`
+	Email                                   string         `json:"email"`
+	Phone                                   string         `json:"phone"`
+	Notes                                   string         `json:"notes"`
+	TaxExemptCategory                       string         `json:"tax_exempt_category"`
+	CustomerGroupID                         int64          `json:"customer_group_id"`
+	Addresses                               []Address      `json:"addresses"`
+	Authentication                          Authentication `json:"authentication"`
+	AcceptsProductReviewAbandonedCartEmails bool           `json:"accepts_product_review_abandoned_cart_emails"`
+	StoreCreditAmounts                      []StoreCredit  `json:"store_credit_amounts"`
+	OriginChannelID                         int            `json:"origin_channel_id"`
+	ChannelIDs                              []int          `json:"channel_ids"`
 }
 
 // StoreCredit is for CreateAccountPayload's store_credit_ammounts field

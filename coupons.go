@@ -43,9 +43,9 @@ func (bc *Client) CreateCoupon(coupon Coupon) (*Coupon, error) {
 		return nil, err
 	}
 	var couponResponse struct {
-		Data Coupon `json:"data,omitempty"`
+		Data Coupon `json:"data"`
 		Meta struct {
-		} `json:"meta,omitempty"`
+		} `json:"meta"`
 	}
 	err = json.Unmarshal(b, &couponResponse)
 	if err != nil {
@@ -65,9 +65,9 @@ func (bc *Client) GetCoupon(couponID int64) (*Coupon, error) {
 		return nil, err
 	}
 	var couponResponse struct {
-		Data Coupon `json:"data,omitempty"`
+		Data Coupon `json:"data"`
 		Meta struct {
-		} `json:"meta,omitempty"`
+		} `json:"meta"`
 	}
 	err = json.Unmarshal(b, &couponResponse)
 	if err != nil {
@@ -89,9 +89,9 @@ func (bc *Client) UpdateCoupon(couponID int64, coupon Coupon) (*Coupon, error) {
 		return nil, err
 	}
 	var couponResponse struct {
-		Data Coupon `json:"data,omitempty"`
+		Data Coupon `json:"data"`
 		Meta struct {
-		} `json:"meta,omitempty"`
+		} `json:"meta"`
 	}
 	err = json.Unmarshal(b, &couponResponse)
 	if err != nil {
@@ -111,9 +111,9 @@ func (bc *Client) DeleteCoupon(couponID int64) error {
 		return err
 	}
 	var couponResponse struct {
-		Data Coupon `json:"data,omitempty"`
+		Data Coupon `json:"data"`
 		Meta struct {
-		} `json:"meta,omitempty"`
+		} `json:"meta"`
 	}
 	err = json.Unmarshal(b, &couponResponse)
 	if err != nil {
@@ -160,10 +160,10 @@ func (bc *Client) GetCoupons(args map[string]string, page int) ([]Coupon, bool, 
 		return nil, false, err
 	}
 	var couponResponse struct {
-		Data []Coupon `json:"data,omitempty"`
+		Data []Coupon `json:"data"`
 		Meta struct {
-			Pagination Pagination `json:"pagination,omitempty"`
-		} `json:"meta,omitempty"`
+			Pagination Pagination `json:"pagination"`
+		} `json:"meta"`
 	}
 	err = json.Unmarshal(b, &couponResponse)
 	if err != nil {
