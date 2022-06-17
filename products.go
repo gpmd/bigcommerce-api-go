@@ -149,7 +149,7 @@ func (bc *Client) GetAllProducts(args map[string]string) ([]Product, error) {
 	retries := 0
 	for more {
 		psp, more, err = bc.GetProducts(args, page)
-		//		log.Printf("products page %d entries %d %v", page, len(psp), args)
+		log.Printf("products page %d entries %d %v", page, len(psp), args)
 		if err != nil {
 			retries++
 			if retries > bc.MaxRetries {
@@ -201,7 +201,7 @@ func (bc *Client) GetProducts(args map[string]string, page int) ([]Product, bool
 	if err != nil {
 		return nil, false, err
 	}
-	//	log.Printf("%d products (%+v)", len(pp.Data), pp.Meta.Pagination)
+	log.Printf("%d products (%+v)", len(pp.Data), pp.Meta.Pagination)
 
 	if pp.Status != 0 {
 		return nil, false, errors.New(pp.Title)
@@ -232,7 +232,7 @@ func (bc *Client) GetProductByID(productID int64) (*Product, error) {
 	if err != nil {
 		return nil, err
 	}
-	//	log.Printf("Product %d: %s", productID, string(body))
+	log.Printf("Product %d: %s", productID, string(body))
 	return &productResponse.Data, nil
 }
 
