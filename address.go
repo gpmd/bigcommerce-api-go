@@ -11,21 +11,21 @@ import (
 
 // Address is for Customer Address endpoint
 type Address struct {
-	ID              int64       `json:"id"`
-	CustomerID      int64       `json:"customer_id"`
+	ID              int64       `json:"id,omitempty"`
+	CustomerID      int64       `json:"customer_id,omitempty"`
 	Address1        string      `json:"address1"`
-	Address2        string      `json:"address2"`
-	AddressType     string      `json:"address_type"`
+	Address2        string      `json:"address2,omitempty"`
+	AddressType     string      `json:"address_type,omitempty"`
 	City            string      `json:"city"`
-	Company         string      `json:"company"`
-	Country         string      `json:"country"`
+	Company         string      `json:"company,omitempty"`
+	Country         string      `json:"country,omitempty"`
 	CountryCode     string      `json:"country_code"`
 	FirstName       string      `json:"first_name"`
 	LastName        string      `json:"last_name"`
-	Phone           string      `json:"phone"`
-	PostalCode      string      `json:"postal_code"`
-	StateOrProvince string      `json:"state_or_province"`
-	FormFields      []FormField `json:"form_fields"`
+	Phone           string      `json:"phone,omitempty"`
+	PostalCode      string      `json:"postal_code,omitempty"`
+	StateOrProvince string      `json:"state_or_province,omitempty"`
+	FormFields      []FormField `json:"form_fields,omitempty"`
 }
 
 // GetAddresses returns all addresses for a curstomer, handling pagination

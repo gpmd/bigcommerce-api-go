@@ -131,7 +131,7 @@ func (bc *Client) CreateWebhook(scope, destination string, headers map[string]st
 	payload := struct {
 		Scope       string            `json:"scope"`
 		Destination string            `json:"destination"`
-		Headers     map[string]string `json:"headers"`
+		Headers     map[string]string `json:"headers,omitempty"`
 	}{
 		Scope:       scope,
 		Destination: destination,
