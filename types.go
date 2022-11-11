@@ -68,7 +68,7 @@ type CartCoupon struct {
 }
 
 type Discount struct {
-	ID               int64   `json:"id"`
+	ID               string   `json:"id"`
 	DiscountedAmount float64 `json:"discounted_amount"`
 }
 
