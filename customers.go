@@ -176,7 +176,7 @@ func (bc *Client) CreateAccount(payload *CreateAccountPayload) (*Customer, error
 	return &ret.Customers[0], nil
 }
 
-// CreateAccount creates a new customer account in BigCommerce and returns the customer or error
+// SaveAccount saves an exising customer account in BigCommerce and returns the customer or error
 func (bc *Client) SaveAccount(payload *SaveAccountPayload) (*Customer, error) {
 	if payload.OriginChannelID == 0 {
 		payload.OriginChannelID = bc.ChannelID
