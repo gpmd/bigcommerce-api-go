@@ -27,9 +27,9 @@ type Product struct {
 	Sku                     string        `json:"sku,omitempty"`
 	Description             string        `json:"description,omitempty"`
 	Weight                  float64       `json:"weight,omitempty"`
-	Width                   int           `json:"width,omitempty"`
-	Depth                   int           `json:"depth,omitempty"`
-	Height                  int           `json:"height,omitempty"`
+	Width                   float64       `json:"width,omitempty"`
+	Depth                   float64       `json:"depth,omitempty"`
+	Height                  float64       `json:"height,omitempty"`
 	Price                   float64       `json:"price,omitempty"`
 	CostPrice               float64       `json:"cost_price,omitempty"`
 	RetailPrice             float64       `json:"retail_price,omitempty"`
@@ -120,7 +120,7 @@ type Product struct {
 		BinPickingNumber          string        `json:"bin_picking_number,omitempty"`
 		OptionValues              []interface{} `json:"option_values,omitempty"`
 	} `json:"variants,omitempty"`
-	Images       []interface{} `json:"images,omitempty"`
+	Images       []Image       `json:"images,omitempty"`
 	PrimaryImage interface{}   `json:"primary_image,omitempty"`
 	Videos       []interface{} `json:"videos,omitempty"`
 	CustomFields []struct {
