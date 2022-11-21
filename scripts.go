@@ -73,3 +73,24 @@ func (bc *Client) GetScriptByID(uuid string) (*Script, error) {
 	}
 	return &sRes.Data, err
 }
+
+func (bc *Client) GetScripts() ([]Script, error) {
+	req := bc.getAPIRequest(http.MethodGet, "/v3/content/scripts", nil)
+	res, err := bc.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+	var sRes struct {
+		Data []Script `json:"data"`
+	}
+	b, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(b, &sRes)
+	if err != nil {
+		return nil, fmt.Errorf("error getting scripts: %v %s", err, string(b))
+	}
+	return sRes.Data, err
+}
