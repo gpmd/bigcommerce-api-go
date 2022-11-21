@@ -134,7 +134,7 @@ func (bc *Client) CartAddItems(cartID string, items []LineItem) (*Cart, error) {
 	}
 	b, err := processBody(res)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s", string(b))
 	}
 	var cartResponse struct {
 		Data Cart `json:"data,omitempty"`
