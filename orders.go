@@ -284,7 +284,7 @@ func (bc *Client) GetOrder(orderID int64) (*Order, error) {
 	order.ShippingAddresses = addresses
 	coupons, err := bc.GetOrderCoupons(orderID)
 	if err != nil {
-		return &order, nil // well, we got the order, but we can't get the addresses
+		return &order, nil // well, we got the order, but we can't get the coupons
 	}
 	order.Coupons = coupons
 	return &order, nil
@@ -343,7 +343,7 @@ func (bc *Client) GetOrderShippingAddresses(orderID int64) ([]OrderShippingAddre
 
 // GetOrderCoupons returns all coupons for a given order
 func (bc *Client) GetOrderCoupons(orderID int64) ([]OrderCoupon, error) {
-	url := "/v2/orders/" + strconv.FormatInt(orderID, 10) + "/shipping_addresses"
+	url := "/v2/orders/" + strconv.FormatInt(orderID, 10) + "/coupons"
 
 	req := bc.getAPIRequest(http.MethodGet, url, nil)
 	res, err := bc.HTTPClient.Do(req)
