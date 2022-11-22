@@ -61,15 +61,15 @@ type InventoryEntry struct {
 }
 
 type CartCoupon struct {
-	Code             string  `json:"code"`
-	ID               string  `json:"id"`
-	CouponType       string  `json:"coupon_type"`
-	DiscountedAmount float64 `json:"discounted_amount"`
+	Code             string      `json:"code"`
+	ID               interface{} `json:"id"`
+	CouponType       string      `json:"coupon_type"`
+	DiscountedAmount float64     `json:"discounted_amount"`
 }
 
 type Discount struct {
-	ID               string   `json:"id"`
-	DiscountedAmount float64 `json:"discounted_amount"`
+	ID               interface{} `json:"id"`
+	DiscountedAmount float64     `json:"discounted_amount"`
 }
 
 type ErrorResult struct {
