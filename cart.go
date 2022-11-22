@@ -42,26 +42,26 @@ type Cart struct {
 
 // LineItem is a BigCommerce line item object for cart
 type LineItem struct {
-	ID                string     `json:"id,omitempty"`
-	ParentID          int64      `json:"parent_id,omitempty"`
-	VariantID         int64      `json:"variant_id,omitempty"`
-	ProductID         int64      `json:"product_id,omitempty"`
-	Sku               string     `json:"sku,omitempty"`
-	Name              string     `json:"name,omitempty"`
-	URL               string     `json:"url,omitempty"`
-	Quantity          float64    `json:"quantity,omitempty"`
-	Taxable           bool       `json:"taxable,omitempty"`
-	ImageURL          string     `json:"image_url,omitempty"`
-	Discounts         []Discount `json:"discounts,omitempty"`
-	Coupons           []Coupon   `json:"coupons,omitempty"`
-	DiscountAmount    float64    `json:"discount_amount,omitempty"`
-	CouponAmount      float64    `json:"coupon_amount,omitempty"`
-	ListPrice         float64    `json:"list_price,omitempty"`
-	SalePrice         float64    `json:"sale_price,omitempty"`
-	ExtendedListPrice float64    `json:"extended_list_price,omitempty"`
-	ExtendedSalePrice float64    `json:"extended_sale_price,omitempty"`
-	IsRequireShipping bool       `json:"is_require_shipping,omitempty"`
-	IsMutable         bool       `json:"is_mutable,omitempty"`
+	ID                string      `json:"id,omitempty"`
+	ParentID          int64       `json:"parent_id,omitempty"`
+	VariantID         int64       `json:"variant_id,omitempty"`
+	ProductID         int64       `json:"product_id,omitempty"`
+	Sku               string      `json:"sku,omitempty"`
+	Name              string      `json:"name,omitempty"`
+	URL               string      `json:"url,omitempty"`
+	Quantity          float64     `json:"quantity,omitempty"`
+	Taxable           bool        `json:"taxable,omitempty"`
+	ImageURL          string      `json:"image_url,omitempty"`
+	Discounts         []Discount  `json:"discounts,omitempty"`
+	Coupons           interface{} `json:"coupons,omitempty"`
+	DiscountAmount    float64     `json:"discount_amount,omitempty"`
+	CouponAmount      float64     `json:"coupon_amount,omitempty"`
+	ListPrice         float64     `json:"list_price,omitempty"`
+	SalePrice         float64     `json:"sale_price,omitempty"`
+	ExtendedListPrice float64     `json:"extended_list_price,omitempty"`
+	ExtendedSalePrice float64     `json:"extended_sale_price,omitempty"`
+	IsRequireShipping bool        `json:"is_require_shipping,omitempty"`
+	IsMutable         bool        `json:"is_mutable,omitempty"`
 }
 
 type CartURLs struct {
