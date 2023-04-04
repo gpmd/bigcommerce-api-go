@@ -56,6 +56,7 @@ type LineItem struct {
 	Coupons           interface{} `json:"coupons,omitempty"`
 	DiscountAmount    float64     `json:"discount_amount,omitempty"`
 	CouponAmount      float64     `json:"coupon_amount,omitempty"`
+	OriginalPrice     float64     `json:"original_price,omitempty"`
 	ListPrice         float64     `json:"list_price,omitempty"`
 	SalePrice         float64     `json:"sale_price,omitempty"`
 	ExtendedListPrice float64     `json:"extended_list_price,omitempty"`
