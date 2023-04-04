@@ -64,6 +64,8 @@ type LineItem struct {
 	IsRequireShipping bool        `json:"is_require_shipping,omitempty"`
 	IsMutable         bool        `json:"is_mutable,omitempty"`
 	Weight            float64     `json:"weight,omitempty"`
+	NetWeight         string      `json:"net_weight,omitempty"`
+	UnitOfMeasurement string      `json:"unit_of_measurement,omitempty"`
 }
 
 type CartURLs struct {
