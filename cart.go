@@ -63,6 +63,7 @@ type LineItem struct {
 	ExtendedSalePrice float64     `json:"extended_sale_price,omitempty"`
 	IsRequireShipping bool        `json:"is_require_shipping,omitempty"`
 	IsMutable         bool        `json:"is_mutable,omitempty"`
+	Weight            float64     `json:"weight,omitempty"`
 }
 
 type CartURLs struct {
