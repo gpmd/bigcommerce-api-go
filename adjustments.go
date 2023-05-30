@@ -7,11 +7,11 @@ import (
 )
 
 type Adjustment struct {
-	Reason string `json:"reason"`
-	Items  []Item `json:"items"`
+	Reason string           `json:"reason"`
+	Items  []AdjustmentItem `json:"items"`
 }
 
-type Item struct {
+type AdjustmentItem struct {
 	LocationId int    `json:"location_id"`
 	VariantId  int    `json:"variant_id,omitempty"`
 	Quantity   int    `json:"quantity"`
@@ -19,6 +19,7 @@ type Item struct {
 	ProductId  int    `json:"product_id,omitempty"`
 }
 
+// AdjustInventoryRelative changes the stock value relative to it's current value
 func (bc *Client) AdjustInventoryRelative(adjustment *Adjustment) error {
 	url := "/v3/inventory/adjustments/relative"
 
@@ -32,6 +33,7 @@ func (bc *Client) AdjustInventoryRelative(adjustment *Adjustment) error {
 	return nil
 }
 
+// AdjustInventoryAbsolute sets the stock value to a specific value
 func (bc *Client) AdjustInventoryAbsolute(adjustment *Adjustment) error {
 	url := "/v3/inventory/adjustments/absolute"
 

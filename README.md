@@ -1902,3 +1902,69 @@ GetWebhookPayload returns a WebhookPayload object and the raw payload from the
 BigCommerce API Arguments: r - the http.Request object Returns: *WebhookPayload
 - the WebhookPayload object []byte - the raw payload from the BigCommerce API
 error - the error, if any
+
+#### type Adjustment
+```go
+type Adjustment struct {
+	Reason string           `json:"reason"`
+	Items  []AdjustmentItem `json:"items"`
+}
+```
+
+#### type AdjustmentItem
+```go
+type AdjustmentItem struct {
+	LocationId int    `json:"location_id"`
+	VariantId  int    `json:"variant_id,omitempty"`
+	Quantity   int    `json:"quantity"`
+	Sku        string `json:"sku,omitempty"`
+	ProductId  int    `json:"product_id,omitempty"`
+}
+```
+
+#### func AdjustInventoryRelative
+```go
+func (bc *Client) AdjustInventoryRelative(adjustment *Adjustment) error
+```
+Adjusts the inventory relatively to it's current value. -1 will subtract one, and 1 will add one to the stock.
+
+#### func AdjustInventoryAbsolute
+```go
+func (bc *Client) AdjustInventoryAbsolute(adjustment *Adjustment) error
+```
+Set the inventory's stock value absolutely to the value given. -1 will set the value to -1, 1 will set it to 1.
+
+#### type Location
+```go
+type Location struct {
+	Code                    string                 `json:"code"`
+	Label                   string                 `json:"label"`
+	Description             string                 `json:"description"`
+	ManagedByExternalSource bool                   `json:"managed_by_external_source"`
+	TypeId                  string                 `json:"type_id"`
+	Enabled                 bool                   `json:"enabled"`
+	OperatingHours          LocationOpeningHours   `json:"operating_hours"`
+	TimeZone                string                 `json:"time_zone"`
+	Address                 LocationAddress        `json:"address"`
+	StorefrontVisibility    bool                   `json:"storefront_visibility"`
+	SpecialHours            []LocationSpecialHours `json:"special_hours"`
+}
+```
+
+#### func GetLocations
+```go
+func (bc *Client) GetLocations(filters map[string]string) ([]Location, error)
+```
+Gets all the locations that belong to a shop
+
+#### func CreateLocation
+```go
+func (bc *Client) CreateLocation(location *Location) error
+```
+Create a new location
+
+#### func UpdateLocation
+```go
+func (bc *Client) UpdateLocation(location *Location) error
+```
+Updates the locations values

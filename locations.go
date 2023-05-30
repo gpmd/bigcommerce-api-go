@@ -85,7 +85,7 @@ type LocationSpecialHours struct {
 	Annual  bool   `json:"annual"`
 }
 
-// GetLocations returns all orders using filters.
+// GetLocations returns all locations using filters.
 // filters: request query parameters for BigCommerce locations endpoint, for example {"is_active": true}
 func (bc *Client) GetLocations(filters map[string]string) ([]Location, error) {
 	var params []string
@@ -117,6 +117,7 @@ func (bc *Client) GetLocations(filters map[string]string) ([]Location, error) {
 	return locations, nil
 }
 
+// CreateLocation creates a new location based on the Location struct
 func (bc *Client) CreateLocation(location *Location) error {
 	url := "/v3/inventory/locations"
 
@@ -130,6 +131,7 @@ func (bc *Client) CreateLocation(location *Location) error {
 	return nil
 }
 
+// UpdateLocation alters the locations values
 func (bc *Client) UpdateLocation(location *Location) error {
 	url := "/v3/inventory/locations"
 
