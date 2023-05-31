@@ -1206,6 +1206,32 @@ type OrderShippingAddress struct {
 }
 ```
 
+#### type OrderShipment
+
+```go
+type OrderShipment struct {
+	ID                   int64   `json:"id"`
+	OrderID              int64   `json:"order_id"`
+	CustomerID           int64   `json:"customer_id"`
+	OrderAddressID       int64   `json:"order_address_id"`
+	DateCreated          string  `json:"date_created"`
+	TrackingNumber       string  `json:"tracking_number"`
+	MerchantShippingCost string  `json:"merchant_shipping_cost"`
+	ShippingMethod       string  `json:"shipping_method"`
+	Comments             string  `json:"comments"`
+	ShippingProvider     string  `json:"shipping_provider"`
+	TrackingCarrier      string  `json:"tracking_carrier"`
+	TrackingLink         string  `json:"tracking_link"`
+	BillingAddress       Address `json:"billing_address"`
+	ShippingAddress      Address `json:"shipping_address"`
+	Items                []struct {
+		OrderProductID int64 `json:"order_product_id"`
+		ProductID      int64 `json:"product_id"`
+		Quantity       int   `json:"quantity"`
+	} `json:"items"`
+}
+```
+
 
 #### type Pagination
 

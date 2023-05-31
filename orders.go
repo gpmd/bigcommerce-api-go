@@ -218,6 +218,28 @@ type OrderCoupon struct {
 	Discount int    `json:"discount"`
 }
 
+type OrderShipment struct {
+	ID                   int64   `json:"id"`
+	OrderID              int64   `json:"order_id"`
+	CustomerID           int64   `json:"customer_id"`
+	OrderAddressID       int64   `json:"order_address_id"`
+	DateCreated          string  `json:"date_created"`
+	TrackingNumber       string  `json:"tracking_number"`
+	MerchantShippingCost string  `json:"merchant_shipping_cost"`
+	ShippingMethod       string  `json:"shipping_method"`
+	Comments             string  `json:"comments"`
+	ShippingProvider     string  `json:"shipping_provider"`
+	TrackingCarrier      string  `json:"tracking_carrier"`
+	TrackingLink         string  `json:"tracking_link"`
+	BillingAddress       Address `json:"billing_address"`
+	ShippingAddress      Address `json:"shipping_address"`
+	Items                []struct {
+		OrderProductID int64 `json:"order_product_id"`
+		ProductID      int64 `json:"product_id"`
+		Quantity       int   `json:"quantity"`
+	} `json:"items"`
+}
+
 // GetOrders returns all orders using filters
 // filters: request query parameters for BigCommerce orders endpoint, for example {"customer_id": "41"}
 func (bc *Client) GetOrders(filters map[string]string) ([]Order, error) {
@@ -363,4 +385,28 @@ func (bc *Client) GetOrderCoupons(orderID int64) ([]OrderCoupon, error) {
 		return nil, err
 	}
 	return coupons, nil
+}
+
+// GetOrderShipments returns all shipments for a given order
+func (bc *Client) GetOrderShipments(orderID int64) ([]OrderShipment, error) {
+	url := "/v2/orders/" + strconv.FormatInt(orderID, 10) + "/shipments"
+
+	req := bc.getAPIRequest(http.MethodGet, url, nil)
+	res, err := bc.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer res.Body.Close()
+	body, err := processBody(res)
+	if err != nil {
+		return nil, err
+	}
+
+	var shipments []OrderShipment
+	err = json.Unmarshal(body, &shipments)
+	if err != nil {
+		return nil, err
+	}
+	return shipments, nil
 }
