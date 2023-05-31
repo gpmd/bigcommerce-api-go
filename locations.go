@@ -3,6 +3,7 @@ package bigcommerce
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -19,60 +20,34 @@ type Location struct {
 	TimeZone                string                 `json:"time_zone"`
 	Address                 LocationAddress        `json:"address"`
 	StorefrontVisibility    bool                   `json:"storefront_visibility"`
-	SpecialHours            []LocationSpecialHours `json:"special_hours"`
+	SpecialHours            []LocationSpecialHours `json:"special_hours,omitempty"`
 }
 
 type LocationAddress struct {
-	Address1       string `json:"address1"`
-	Address2       string `json:"address2"`
-	City           string `json:"city"`
-	State          string `json:"state"`
-	Zip            string `json:"zip"`
-	Email          string `json:"email"`
-	Phone          string `json:"phone"`
-	GeoCoordinates struct {
-		Latitude  float64 `json:"latitude"`
-		Longitude float64 `json:"longitude"`
-	} `json:"geo_coordinates"`
-	CountryCode string `json:"country_code"`
+	Address1       string      `json:"address1"`
+	Address2       string      `json:"address2"`
+	City           string      `json:"city"`
+	State          string      `json:"state"`
+	Zip            string      `json:"zip"`
+	Email          string      `json:"email"`
+	Phone          string      `json:"phone"`
+	GeoCoordinates Coordenates `json:"geo_coordinates"`
+	CountryCode    string      `json:"country_code"`
+}
+
+type Coordenates struct {
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
 }
 
 type LocationOpeningHours struct {
-	Sunday struct {
-		Open    bool   `json:"open"`
-		Opening string `json:"opening"`
-		Closing string `json:"closing"`
-	} `json:"sunday"`
-	Monday struct {
-		Open    bool   `json:"open"`
-		Opening string `json:"opening"`
-		Closing string `json:"closing"`
-	} `json:"monday"`
-	Tuesday struct {
-		Open    bool   `json:"open"`
-		Opening string `json:"opening"`
-		Closing string `json:"closing"`
-	} `json:"tuesday"`
-	Wednesday struct {
-		Open    bool   `json:"open"`
-		Opening string `json:"opening"`
-		Closing string `json:"closing"`
-	} `json:"wednesday"`
-	Thursday struct {
-		Open    bool   `json:"open"`
-		Opening string `json:"opening"`
-		Closing string `json:"closing"`
-	} `json:"thursday"`
-	Friday struct {
-		Open    bool   `json:"open"`
-		Opening string `json:"opening"`
-		Closing string `json:"closing"`
-	} `json:"friday"`
-	Saturday struct {
-		Open    bool   `json:"open"`
-		Opening string `json:"opening"`
-		Closing string `json:"closing"`
-	} `json:"saturday"`
+	Sunday    Weekday `json:"sunday"`
+	Monday    Weekday `json:"monday"`
+	Tuesday   Weekday `json:"tuesday"`
+	Wednesday Weekday `json:"wednesday"`
+	Thursday  Weekday `json:"thursday"`
+	Friday    Weekday `json:"friday"`
+	Saturday  Weekday `json:"saturday"`
 }
 
 type LocationSpecialHours struct {
@@ -83,6 +58,12 @@ type LocationSpecialHours struct {
 	Closing string `json:"closing"`
 	AllDay  bool   `json:"all_day"`
 	Annual  bool   `json:"annual"`
+}
+
+type Weekday struct {
+	Open    bool   `json:"open"`
+	Opening string `json:"opening"`
+	Closing string `json:"closing"`
 }
 
 // GetLocations returns all locations using filters.
@@ -111,21 +92,28 @@ func (bc *Client) GetLocations(filters map[string]string) ([]Location, error) {
 
 	var locations []Location
 	err = json.Unmarshal(body, &locations)
+	print(string(body))
 	if err != nil {
 		return nil, err
 	}
 	return locations, nil
 }
 
-// CreateLocation creates a new location based on the Location struct
-func (bc *Client) CreateLocation(location *Location) error {
+// CreateLocations creates a new location based on the Location struct
+func (bc *Client) CreateLocations(location *[]Location) error {
 	url := "/v3/inventory/locations"
 
 	reqJSON, _ := json.Marshal(location)
+
+	fmt.Println(string(reqJSON))
 	req := bc.getAPIRequest(http.MethodPost, url, bytes.NewReader(reqJSON))
-	_, err := bc.HTTPClient.Do(req)
+	res, err := bc.HTTPClient.Do(req)
 	if err != nil {
 		return err
+	}
+
+	if res.StatusCode != 200 {
+		return errors.New(res.Status)
 	}
 
 	return nil
