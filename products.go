@@ -102,9 +102,9 @@ type Product struct {
 		RetailPrice               float64       `json:"retail_price,omitempty"`
 		MapPrice                  float64       `json:"map_price,omitempty"`
 		Weight                    float64       `json:"weight,omitempty"`
-		Width                     int           `json:"width,omitempty"`
-		Height                    int           `json:"height,omitempty"`
-		Depth                     int           `json:"depth,omitempty"`
+		Width                     float64       `json:"width,omitempty"`
+		Height                    float64       `json:"height,omitempty"`
+		Depth                     float64       `json:"depth,omitempty"`
 		IsFreeShipping            bool          `json:"is_free_shipping,omitempty"`
 		FixedCostShippingPrice    float64       `json:"fixed_cost_shipping_price,omitempty"`
 		CalculatedWeight          float64       `json:"calculated_weight,omitempty"`
