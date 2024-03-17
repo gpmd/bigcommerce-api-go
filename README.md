@@ -14,7 +14,7 @@ func main() {
     // for app development, you need to provide arguments
     // for CLI and other web apps you can use empty strings
     client := bigcommerce.NewClient("** my store's hash like '123abcdefg' **", "**my X-Auth-Token generated in BigCommerce admin**")
-    products, err := client.GetAllProducts()
+    products, err := client.GetAllProducts(map[string]string{})
     if err != nil {
         log.Fatalf("Error while getting products: %v", err)
     }
